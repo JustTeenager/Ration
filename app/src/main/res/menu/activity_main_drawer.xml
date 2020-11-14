@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/main"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_main"
+            android:icon="@drawable/ic_main"
+        android:title="@string/main" />
+        </group>
+
+    <group
+        android:id="@+id/calculate"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_analize"
+            android:icon="@drawable/ic_list"
+            android:title="@string/analysis" />
+    </group>
+    <group
+        android:id="@+id/support"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_support"
+            android:icon="@drawable/ic_analize"
+            android:title="@string/feedback" />
+    </group>
+    <group
+        android:id="@+id/update"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_update"
+            android:icon="@drawable/ic_nav_update"
+            android:title="@string/update" />
+    </group>
+    <group
+        android:id="@+id/insert"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_insert"
+            android:icon="@drawable/ic_nav_insert"
+            android:title="@string/insert" />
+    </group>
+    <group
+        android:id="@+id/bill"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_bill"
+            android:icon="@drawable/ic_bills"
+            android:title="@string/payment" />
+    </group>
+</menu>
