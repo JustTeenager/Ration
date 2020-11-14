@@ -43,6 +43,7 @@ public class AnalyzesListFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.e("ANALYZES_LIST_FRAGMENT", AnalyzesListFragment.class.toString());
         View view = inflater.inflate(R.layout.main_list_frament, container, false);
         db = DataBaseHelper.getInstance(getActivity());
         mFragment = this;

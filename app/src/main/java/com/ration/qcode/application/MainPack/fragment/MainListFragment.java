@@ -42,6 +42,7 @@ public class MainListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.e("MAIN_LIST_FRAGMENT", MainListFragment.class.toString());
         View view = inflater.inflate(R.layout.main_list_frament, container, false);
 
 

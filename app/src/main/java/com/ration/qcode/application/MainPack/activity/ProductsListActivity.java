@@ -55,6 +55,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_list_activity);
+        Log.e("PRODUCT_LIST_ACTIVITY", ProductsListActivity.class.toString());
         dataBaseHelper = DataBaseHelper.getInstance(getApplicationContext());
 
 

@@ -60,6 +60,7 @@ public class AddProductActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_product_activity);
+        Log.e("ADD_PRODUCT_ACTIVITY", AddProductActivity.class.toString());
 
         decimalFormat = new DecimalFormat("#.##");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_top);
@@ -97,14 +98,7 @@ public class AddProductActivity extends AppCompatActivity {
         alarmStartTime.set(Calendar.DAY_OF_MONTH,  prefs.getInt(DAY, 0));
         alarmStartTime.set(Calendar.HOUR_OF_DAY,  prefs.getInt(HOUR, 0));
         alarmStartTime.set(Calendar.MINUTE,  prefs.getInt(MINUTE, 0));
-        Log.d("LOGS", "alarmStartTime = " + alarmStartTime.getTime());
-        Log.d("LOGS", "alarmNowTime = " + alarmNowTime.getTime());
-        if(alarmNowTime.getTime().compareTo(alarmStartTime.getTime()) >= 0) {
-            Log.d("LOGS", "OK");
-            return true;
-        } else {
-            return false;
-        }
+        return alarmNowTime.getTime().compareTo(alarmStartTime.getTime()) >= 0;
     }
 
     private void getIntents() {

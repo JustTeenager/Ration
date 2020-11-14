@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
+import com.ration.qcode.application.MainPack.dialog.ChooseProductDialog;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.SwipeDetector;
@@ -78,6 +79,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_info_activity);
+        Log.e("PRODICTION_INFO", ProductInfoActivity.class.toString());
 
         db = DataBaseHelper.getInstance(getApplicationContext());
 
@@ -149,8 +151,10 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addProduct();
-
+              //  addProduct();
+                ChooseProductDialog dialog = new ChooseProductDialog(date,menu,intent);
+                dialog.show(getFragmentManager(),null);
+                setAdapter();
             }
         });
     }
@@ -171,12 +175,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         return super.onOptionsItemSelected(item);
     }
 
-    public void addProduct() {
-
-        adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
-                products, proteins, fats, carbohydrates, fas, kl, gr);
-        listViewProducts.setOnItemClickListener(this);
-        listViewProducts.setAdapter(adapter);
+    /*public void addProduct() {
 
         Intent inten = new Intent(this, AddProductActivity.class);
         if (intent.getStringExtra("From menu") != null) {
@@ -186,6 +185,13 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         }
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(inten);
+    }*/
+
+    private void setAdapter() {
+        adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
+                products, proteins, fats, carbohydrates, fas, kl, gr);
+        listViewProducts.setOnItemClickListener(this);
+        listViewProducts.setAdapter(adapter);
     }
 
     public void saveToDB(View view) {

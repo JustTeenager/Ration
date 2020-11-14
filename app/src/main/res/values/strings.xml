@@ -43,4 +43,7 @@
     <string name="account">410014198805466</string>
     <string name="client_id">F4C33E5FDE2D3BB4892D4FEBCAA10A8ED53525BAF383F4A2F76BBE8587CED803</string>
     <string name="host">https://money.yandex.ru</string>
+    <string name="choose_product">Выберете нужный продукт</string>
+    <string name="complicated_product">составной</string>
+    <string name="no_complicated_product">не составной</string>
 </resources>
