@@ -2,6 +2,7 @@ package com.ration.qcode.application.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ration.qcode.application.utils.internet.AddMenuAPI;
 import com.ration.qcode.application.utils.internet.AddProductAPI;
 
 import retrofit2.Retrofit;
@@ -33,4 +34,7 @@ public class NetworkService {
         return mRetrofit.create(AddProductAPI.class);
     }
 
+    public AddMenuAPI getMenuJSONApi(){
+        return mRetrofit.create(AddMenuAPI.class);
+    }
 }

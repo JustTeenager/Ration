@@ -112,7 +112,7 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
                                                         if (response.isSuccessful()) {
                                                             Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                                             if (response.body().getStatus().equals("ok")) {
-                                                                Toast.makeText(getContext(), response.body().getAnswer().toString(), Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(getContext(), response.body().getAnswer(), Toast.LENGTH_SHORT).show();
                                                                 dismiss();
                                                             }
                                                         }

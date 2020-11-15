@@ -14,18 +14,26 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
 import com.ration.qcode.application.MainPack.dialog.ChooseProductDialog;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
+import com.ration.qcode.application.utils.Constants;
+import com.ration.qcode.application.utils.NetworkService;
 import com.ration.qcode.application.utils.SwipeDetector;
+import com.ration.qcode.application.utils.internet.AddProductResponse;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
 import static com.ration.qcode.application.utils.Constants.DATE;
@@ -210,6 +218,8 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
+                    insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
                 }
             }
         } else {
@@ -225,6 +235,8 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(timeNow, datenow, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
+                    insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
                 }
             }
         }
@@ -238,6 +250,29 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
         startActivity(i);
 
+    }
+
+    private void insertInHostingIntoMenu(String menu, String date, String product, String fats, String proteins, String carbohydrates,
+                                         String fas, String kl, String gr) {
+        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+                .getMenuJSONApi()
+                .insertProduct(menu,date,product,fats, proteins,carbohydrates,fas,kl,gr)
+                .enqueue(new Callback<AddProductResponse>() {
+                    @Override
+                    public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                        if (response.isSuccessful()) {
+                            Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
+                            if (response.body().getStatus().equals("ok")) {
+                                Log.d("Response","Меню добавлено");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<AddProductResponse> call, Throwable t) {
+
+                    }
+                });
     }
 
 

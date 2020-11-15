@@ -23,7 +23,9 @@ import com.ration.qcode.application.MainPack.fragment.MainListFragment;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.internet.IGetAllDataAPI;
+import com.ration.qcode.application.utils.internet.IGetAllMenuAPI;
 import com.ration.qcode.application.utils.internet.IGetPrice;
+import com.ration.qcode.application.utils.internet.MenuResponse;
 import com.ration.qcode.application.utils.internet.PriceResponse;
 import com.ration.qcode.application.utils.internet.TasksResponse;
 import com.yandex.money.api.methods.payment.params.P2pTransferParams;
@@ -72,8 +74,9 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("DOWNLOAD", "false");
             ed.commit();
-            update();
+            //update();
         }
+        update();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -226,19 +229,20 @@ public class MainActivity extends AppCompatActivity
         progressDialog.setTitle(getString(R.string.wait));
         progressDialog.show();
 
-        Log.d("Tut", "Zashlo");
+        Log.e("Tut", "Zashlo");
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MAIN_URL_CONST)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        //TODO: надо выледить 2 метода enqueue в отдельный поток и потом их синхронизировать
         IGetAllDataAPI allTasksApi = retrofit.create(IGetAllDataAPI.class);
         Call<List<TasksResponse>> call = allTasksApi.getAllTasks();
         call.enqueue(new Callback<List<TasksResponse>>() {
             @Override
             public void onResponse(Call<List<TasksResponse>> call, Response<List<TasksResponse>> response) {
-                Log.d("Tut", "Zashlo1");
+                Log.e("Tut", "Zashlo1");
                 if (response.isSuccessful()) {
-                    Log.d("REsponse", "" + response.body().size());
+                    Log.e("Response", "" + response.body().size());
                     for (int i = 0; i < response.body().size(); i++) {
                         TasksResponse list = response.body().get(i);
                         dataBaseHelper.insertIntoProduct(list.getName() + "|", list.getBelok().replace(",", "."),
@@ -251,10 +255,32 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<List<TasksResponse>> call, Throwable t) {
-                Log.d("Tut", "Zashlo4");
+                Log.e("Tut", "Zashlo4");
                 progressDialog.dismiss();
             }
         });
-        Log.d("Tut", "Zashlo3");
+         //TODO: тут сделать добавление меню во внутреннюю БД из хостинга
+        IGetAllMenuAPI allMenuAPI = retrofit.create(IGetAllMenuAPI.class);
+        Call<List<MenuResponse>> menuResponses = allMenuAPI.getAllMenu();
+        menuResponses.enqueue(new Callback<List<MenuResponse>>() {
+            @Override
+            public void onResponse(Call<List<MenuResponse>> call, Response<List<MenuResponse>> response) {
+                Log.d("Tut", "Зашли в onResponse");
+                if (response.isSuccessful()){
+                    Log.d("Tut","Запрос удался, начинаем считывание данных");
+                    for (MenuResponse menuResponse:response.body()){
+                        dataBaseHelper.insertIntoMenu(menuResponse.getMenu(),menuResponse.getDate(),menuResponse.getProduct(),menuResponse.getJiry(),
+                                menuResponse.getBelki(),menuResponse.getUglevod(),menuResponse.getFa(),menuResponse.getKl(),menuResponse.getGram());
+                    }
+                    progressDialog.dismiss();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<MenuResponse>> call, Throwable t) {
+                Log.d("Tut","Ошибка при заходе в onResponse");
+                progressDialog.dismiss();
+            }
+        });
     }
 }
