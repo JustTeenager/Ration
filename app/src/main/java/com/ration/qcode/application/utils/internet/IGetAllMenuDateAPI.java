@@ -5,8 +5,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
-public interface IGetAllMenuAPI {
-
-    @GET("/querymenu.php")
-    Call<List<MenuResponse>> getAllMenu();
+public interface IGetAllMenuDateAPI {
+    @GET("/querydatemenu.php")
+    Call<List<DateMenuResponse>> getAllMenuDate();
 }

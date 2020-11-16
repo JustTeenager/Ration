@@ -4,8 +4,10 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class MenuResponse {
+    @SerializedName("menu")
     @Expose
     private String menu;
+    @SerializedName("date")
     @Expose
     private String date;
     @Expose

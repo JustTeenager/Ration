@@ -20,11 +20,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private Context mCtx;
     private static final int DATABASE_VERSION = 1;
 
-    private final String TABLE_DATE = "dates";
-    private final String TABLE_MENUES_DATES = "dates_menus";
-    private final String TABLE_MENU = "menus";
-    private final String TABLE_ANALIZES = "analizes";
-    private final String TABLE_ALLPRODUCTS = "products";
+    public static final String TABLE_DATE = "dates";
+    public static final String TABLE_MENUES_DATES = "dates_menus";
+    public static final String TABLE_MENU = "menus";
+    public static final String TABLE_ANALIZES = "analizes";
+    public static final String TABLE_ALLPRODUCTS = "products";
 
 
     private final String ID_MENU = "menu";

@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by deepdev on 12.04.17.
  */
 public class TasksResponse {
-
+    @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("FA")

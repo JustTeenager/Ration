@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
 import com.ration.qcode.application.MainPack.dialog.ChooseProductDialog;
@@ -79,7 +78,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     String date;
     String menu;
     Intent intent;
-    String datenow = dateFormat.format(datenows);
+    String dateNow = dateFormat.format(datenows);
     String timeNow = timeFormat.format(timeNows);
 
 
@@ -211,10 +210,13 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             db.removeFromMenu(date, menu);
             Log.e("MENU", String.valueOf(menu));
             if (!products.isEmpty()) {
-                if (!db.getDates().contains(date))
+                if (!db.getDates().contains(date)) {
                     db.insertDate(date);
+                    insertInHostingIntoDate(date);
+                }
 
                 db.insertMenuDates(menu, date);
+                insertInHostingIntoDateMenu(menu,date);
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
@@ -223,19 +225,22 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 }
             }
         } else {
-            ArrayList<String> menus = db.getMenues(datenow);
+            ArrayList<String> menus = db.getMenues(dateNow);
             int size = menus.size();
             if (!products.isEmpty()) {
                 if (size == 0) {
-                    db.insertDate(datenow);
-                    db.insertMenuDates(timeNow, datenow);
+                    db.insertDate(dateNow);
+                    insertInHostingIntoDate(dateNow);
+                    db.insertMenuDates(timeNow, dateNow);
+                    insertInHostingIntoDateMenu(timeNow,dateNow);
                 } else {
-                    db.insertMenuDates(timeNow, datenow);
+                    db.insertMenuDates(timeNow, dateNow);
+                    insertInHostingIntoDateMenu(timeNow,dateNow);
                 }
                 for (int i = 0; i < products.size(); i++) {
-                    db.insertIntoMenu(timeNow, datenow, products.get(i) + "|", fats.get(i), proteins.get(i),
+                    db.insertIntoMenu(timeNow, dateNow, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
-                    insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
+                    insertInHostingIntoMenu(timeNow, dateNow, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
                 }
             }
@@ -260,8 +265,8 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+
                         if (response.isSuccessful()) {
-                            Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                             if (response.body().getStatus().equals("ok")) {
                                 Log.d("Response","Меню добавлено");
                             }
@@ -275,6 +280,49 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 });
     }
 
+    private void insertInHostingIntoDate(String date){
+        Log.d("Response","Зашли в добавление даты" );
+        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+                .getDateJSONApi()
+                .insertDate(date)
+                .enqueue(new Callback<AddProductResponse>() {
+                    @Override
+                    public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                        Log.d("Response", "зашли в добавление даты");
+                        if (response.isSuccessful()) {
+                            if (response.body().getStatus().equals("ok")) {
+                                Log.d("Response","Дата добавлено");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<AddProductResponse> call, Throwable t) {
+
+                    }
+                });
+    }
+
+    private void insertInHostingIntoDateMenu(String menu, String date){
+        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+                .getMenuDateJSONApi()
+                .insertDateMenu(menu,date)
+                .enqueue(new Callback<AddProductResponse>() {
+                    @Override
+                    public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body().getStatus().equals("ok")) {
+                                Log.d("Response","Меню добавлено");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<AddProductResponse> call, Throwable t) {
+
+                    }
+                });
+    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

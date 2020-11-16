@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -16,14 +18,22 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.dialog.AddProductDialog;
 import com.ration.qcode.application.MainPack.fragment.AnalyzesListFragment;
 import com.ration.qcode.application.MainPack.fragment.FeedbackFragment;
 import com.ration.qcode.application.MainPack.fragment.MainListFragment;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
+import com.ration.qcode.application.utils.Constants;
+import com.ration.qcode.application.utils.internet.DateMenuResponse;
+import com.ration.qcode.application.utils.internet.DateResponse;
 import com.ration.qcode.application.utils.internet.IGetAllDataAPI;
+import com.ration.qcode.application.utils.internet.IGetAllDateAPI;
 import com.ration.qcode.application.utils.internet.IGetAllMenuAPI;
+import com.ration.qcode.application.utils.internet.IGetAllMenuDateAPI;
 import com.ration.qcode.application.utils.internet.IGetPrice;
 import com.ration.qcode.application.utils.internet.MenuResponse;
 import com.ration.qcode.application.utils.internet.PriceResponse;
@@ -59,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     private static final String CLIENT_ID = "F4C33E5FDE2D3BB4892D4FEBCAA10A8ED53525BAF383F4A2F76BBE8587CED803";
     private static final String HOST = "https://money.yandex.ru";
     private SharedPreferences preferences;
+    private Retrofit retrofit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +85,27 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("DOWNLOAD", "false");
             ed.commit();
-            //update();
+            final Handler handler = new Handler(){
+                public void handleMessage(android.os.Message msg) {
+                    progressDialog.dismiss();
+                };
+            };
+            Thread thread=new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    update();
+                    handler.sendMessage(new Message());
+                }
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Thread "+thread.getName()+" interrupted!");
+            }
         }
-        update();
+
+       // update();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -229,12 +258,19 @@ public class MainActivity extends AppCompatActivity
         progressDialog.setTitle(getString(R.string.wait));
         progressDialog.show();
 
-        Log.e("Tut", "Zashlo");
-        Retrofit retrofit = new Retrofit.Builder()
+        Gson gson = new GsonBuilder().setLenient().create();
+        retrofit = new Retrofit.Builder()
                 .baseUrl(MAIN_URL_CONST)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
-        //TODO: надо выледить 2 метода enqueue в отдельный поток и потом их синхронизировать
+        getAllTasksApi();
+        getAllMenuApi();
+        getAllDateApi();
+        getAllDateMenuApi();
+    }
+
+    //TODO: надо выледить 2 метода enqueue в отдельный поток и потом их синхронизировать
+    private void getAllTasksApi() {
         IGetAllDataAPI allTasksApi = retrofit.create(IGetAllDataAPI.class);
         Call<List<TasksResponse>> call = allTasksApi.getAllTasks();
         call.enqueue(new Callback<List<TasksResponse>>() {
@@ -249,17 +285,19 @@ public class MainActivity extends AppCompatActivity
                                 list.getJiry().replace(",", "."), list.getUglevod().replace(",", "."),
                                 list.getFa().replace(",", "."), list.getKkal().replace(",", "."), "100");
                     }
-                    progressDialog.dismiss();
                 }
             }
 
             @Override
             public void onFailure(Call<List<TasksResponse>> call, Throwable t) {
                 Log.e("Tut", "Zashlo4");
-                progressDialog.dismiss();
+                Log.e("Tut", String.valueOf(t));
             }
         });
-         //TODO: тут сделать добавление меню во внутреннюю БД из хостинга
+    }
+
+    //TODO: тут сделать добавление меню во внутреннюю БД из хостинга
+    private void getAllMenuApi() {
         IGetAllMenuAPI allMenuAPI = retrofit.create(IGetAllMenuAPI.class);
         Call<List<MenuResponse>> menuResponses = allMenuAPI.getAllMenu();
         menuResponses.enqueue(new Callback<List<MenuResponse>>() {
@@ -267,20 +305,78 @@ public class MainActivity extends AppCompatActivity
             public void onResponse(Call<List<MenuResponse>> call, Response<List<MenuResponse>> response) {
                 Log.d("Tut", "Зашли в onResponse");
                 if (response.isSuccessful()){
+                    Log.d("Tut", String.valueOf(response.body().size()));
                     Log.d("Tut","Запрос удался, начинаем считывание данных");
-                    for (MenuResponse menuResponse:response.body()){
+                    for (int i = 0; i < response.body().size(); i++) {
+                        MenuResponse menuResponse = response.body().get(i);
+                        Log.d("Data"+i,menuResponse.getMenu());
+                        Log.d("Data"+i,menuResponse.getDate());
+                        Log.d("Data"+i,menuResponse.getProduct());
+                        Log.d("Data"+i,menuResponse.getJiry());
+                        Log.d("Data"+i,menuResponse.getBelki());
+                        Log.d("Data"+i,menuResponse.getUglevod());
+                        Log.d("Data"+i,menuResponse.getFa());
+                        Log.d("Data"+i,menuResponse.getKl());
+                        Log.d("Data"+i,menuResponse.getGram());
                         dataBaseHelper.insertIntoMenu(menuResponse.getMenu(),menuResponse.getDate(),menuResponse.getProduct(),menuResponse.getJiry(),
                                 menuResponse.getBelki(),menuResponse.getUglevod(),menuResponse.getFa(),menuResponse.getKl(),menuResponse.getGram());
                     }
-                    progressDialog.dismiss();
                 }
             }
 
             @Override
             public void onFailure(Call<List<MenuResponse>> call, Throwable t) {
                 Log.d("Tut","Ошибка при заходе в onResponse");
-                progressDialog.dismiss();
+                Log.e("Tut", String.valueOf(t));
             }
         });
+    }
+
+    private void getAllDateMenuApi() {
+        IGetAllMenuDateAPI menuDateAPI = retrofit.create(IGetAllMenuDateAPI.class);
+        Call<List<DateMenuResponse>> call = menuDateAPI.getAllMenuDate();
+        call.enqueue(new Callback<List<DateMenuResponse>>() {
+            @Override
+            public void onResponse(Call<List<DateMenuResponse>> call, Response<List<DateMenuResponse>> response) {
+                Log.e("Tut", "Зашли в onResponse в getAllDateMenuApi()");
+                if (response.isSuccessful()) {
+                    Log.e("Response", "Зашли в onResponse в getAllDateMenuApi() и прошли onSuccessful()"  );
+                    for (int i = 0; i < response.body().size(); i++) {
+                        DateMenuResponse list = response.body().get(i);
+                        dataBaseHelper.insertMenuDates(list.getMenu(),list.getDate());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<DateMenuResponse>> call, Throwable t) {
+                Log.d("Tut","Ошибка при заходе в onResponse в getAllDateMenuApi()");
+                Log.e("Tut", String.valueOf(t));
+            }
+        });
+    }
+
+    private void getAllDateApi() {
+       IGetAllDateAPI getAllDateAPI = retrofit.create(IGetAllDateAPI.class);
+       Call<List<DateResponse>> call = getAllDateAPI.getAllDate();
+       call.enqueue(new Callback<List<DateResponse>>() {
+           @Override
+           public void onResponse(Call<List<DateResponse>> call, Response<List<DateResponse>> response) {
+               Log.e("Tut", "Зашли в onResponse в getAllDateApi()");
+               if (response.isSuccessful()) {
+                   Log.e("Response", "Зашли в onResponse в getAllDateApi() и прошли onSuccessful()"  );
+                   for (int i = 0; i < response.body().size(); i++) {
+                       DateResponse list = response.body().get(i);
+                       dataBaseHelper.insertDate(list.getDate());
+                   }
+               }
+           }
+
+           @Override
+           public void onFailure(Call<List<DateResponse>> call, Throwable t) {
+               Log.d("Tut","Ошибка при заходе в onResponse в getAllDateApi()");
+               Log.e("Tut", String.valueOf(t));
+           }
+       });
     }
 }

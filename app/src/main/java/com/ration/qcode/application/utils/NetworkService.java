@@ -2,7 +2,9 @@ package com.ration.qcode.application.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ration.qcode.application.utils.internet.AddDateAPI;
 import com.ration.qcode.application.utils.internet.AddMenuAPI;
+import com.ration.qcode.application.utils.internet.AddMenuDateAPI;
 import com.ration.qcode.application.utils.internet.AddProductAPI;
 
 import retrofit2.Retrofit;
@@ -36,5 +38,13 @@ public class NetworkService {
 
     public AddMenuAPI getMenuJSONApi(){
         return mRetrofit.create(AddMenuAPI.class);
+    }
+
+    public AddDateAPI getDateJSONApi(){
+        return mRetrofit.create(AddDateAPI.class);
+    }
+
+    public AddMenuDateAPI getMenuDateJSONApi(){
+        return mRetrofit.create(AddMenuDateAPI.class);
     }
 }

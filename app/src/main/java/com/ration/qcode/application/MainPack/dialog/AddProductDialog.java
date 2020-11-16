@@ -109,6 +109,7 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
                                                 new Callback<AddProductResponse>() {
                                                     @Override
                                                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                                                        Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                                         if (response.isSuccessful()) {
                                                             Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                                             if (response.body().getStatus().equals("ok")) {
