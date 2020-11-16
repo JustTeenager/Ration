@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.ration.qcode.application.utils.internet.DateMenuResponse;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -122,7 +125,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(FA, fa);
         values.put(KL, kl);
         values.put(GRAM, gram);
-        db.insert(TABLE_MENU, null, values);
+        db.insertWithOnConflict(TABLE_MENU, null, values,SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 
@@ -201,6 +204,22 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return all;
     }
 
+    public ArrayList<String> getDates(String date) {
+        ArrayList<String> all = new ArrayList<>();
+        String selectQuery = "SELECT * FROM "
+                + TABLE_DATE+
+                " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
+        dbR = this.getReadableDatabase();
+        Cursor c = dbR.rawQuery(selectQuery, null);
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            all.add(c.getString(c.getColumnIndex(DATE)));
+        }
+        c.close();
+        //  dbR.close();
+        Collections.reverse(all);
+        return all;
+    }
+
     public ArrayList<String> getProducts(String date, String menu) {
         ArrayList<String> all = new ArrayList<>();
         if (date == null || menu == null) {
@@ -243,12 +262,31 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return all;
     }
 
+    public ArrayList<DateMenuResponse> getMenuAndDate(String menu, String date) {
+        ArrayList<DateMenuResponse> all = new ArrayList<>();
+        String selectQuery = "SELECT * FROM "
+                + TABLE_MENUES_DATES +
+                " WHERE TRIM(" + ID_MENU + ") = '" + menu.trim() + "' AND "
+                + "(" + DATE + ") = '" + date.trim() + "'";
+        dbR = this.getReadableDatabase();
+        Cursor c = dbR.rawQuery(selectQuery, null);
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            DateMenuResponse response = new DateMenuResponse();
+            response.setMenu(c.getString(c.getColumnIndex(ID_MENU)));
+            response.setDate(c.getString(c.getColumnIndex(DATE)));
+            all.add(response);
+        }
+        c.close();
+        // dbR.close();
+        return all;
+    }
+
     public void insertDate(String date) {
         dbW = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DATE, date);
         Log.e("dateBASE", date);
-        dbW.insert(TABLE_DATE, null, values);
+        dbW.insertWithOnConflict(TABLE_DATE, null, values,SQLiteDatabase.CONFLICT_REPLACE);
 
     }
 
@@ -257,7 +295,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(DATE, date);
         values.put(ID_MENU, menu);
-        dbW.insert(TABLE_MENUES_DATES, null, values);
+        dbW.insertWithOnConflict(TABLE_MENUES_DATES, null, values,SQLiteDatabase.CONFLICT_REPLACE);
         //  dbW.close();
     }
 

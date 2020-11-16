@@ -3,6 +3,7 @@ package com.ration.qcode.application.MainPack.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -85,27 +86,10 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("DOWNLOAD", "false");
             ed.commit();
-            final Handler handler = new Handler(){
-                public void handleMessage(android.os.Message msg) {
-                    progressDialog.dismiss();
-                };
-            };
-            Thread thread=new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    update();
-                    handler.sendMessage(new Message());
-                }
-            });
-            thread.start();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException("Thread "+thread.getName()+" interrupted!");
-            }
+            //update();
+            new UpdateLocalDbTasks().execute();
         }
-
-       // update();
+        else setFragment(MainListFragment.class);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -115,7 +99,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        setFragment(MainListFragment.class);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (prefs.getInt(YEAR, 0) == 0) {
@@ -263,10 +246,11 @@ public class MainActivity extends AppCompatActivity
                 .baseUrl(MAIN_URL_CONST)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
-        getAllTasksApi();
-        getAllMenuApi();
-        getAllDateApi();
-        getAllDateMenuApi();
+        //getAllTasksApi();
+        //getAllMenuApi();
+        //getAllDateApi();
+        //getAllDateMenuApi();
+        progressDialog.dismiss();
     }
 
     //TODO: надо выледить 2 метода enqueue в отдельный поток и потом их синхронизировать
@@ -276,9 +260,9 @@ public class MainActivity extends AppCompatActivity
         call.enqueue(new Callback<List<TasksResponse>>() {
             @Override
             public void onResponse(Call<List<TasksResponse>> call, Response<List<TasksResponse>> response) {
-                Log.e("Tut", "Zashlo1");
+                Log.d("Tut", "Zashlo1");
                 if (response.isSuccessful()) {
-                    Log.e("Response", "" + response.body().size());
+                    Log.d("Tut", "" + response.body().size());
                     for (int i = 0; i < response.body().size(); i++) {
                         TasksResponse list = response.body().get(i);
                         dataBaseHelper.insertIntoProduct(list.getName() + "|", list.getBelok().replace(",", "."),
@@ -309,24 +293,26 @@ public class MainActivity extends AppCompatActivity
                     Log.d("Tut","Запрос удался, начинаем считывание данных");
                     for (int i = 0; i < response.body().size(); i++) {
                         MenuResponse menuResponse = response.body().get(i);
-                        Log.d("Data"+i,menuResponse.getMenu());
-                        Log.d("Data"+i,menuResponse.getDate());
-                        Log.d("Data"+i,menuResponse.getProduct());
-                        Log.d("Data"+i,menuResponse.getJiry());
-                        Log.d("Data"+i,menuResponse.getBelki());
-                        Log.d("Data"+i,menuResponse.getUglevod());
-                        Log.d("Data"+i,menuResponse.getFa());
-                        Log.d("Data"+i,menuResponse.getKl());
-                        Log.d("Data"+i,menuResponse.getGram());
-                        dataBaseHelper.insertIntoMenu(menuResponse.getMenu(),menuResponse.getDate(),menuResponse.getProduct(),menuResponse.getJiry(),
-                                menuResponse.getBelki(),menuResponse.getUglevod(),menuResponse.getFa(),menuResponse.getKl(),menuResponse.getGram());
+                        Log.d("Data_menu"+i,menuResponse.getMenu());
+                        Log.d("Data_menu"+i,menuResponse.getDate());
+                        Log.d("Data_menu"+i,menuResponse.getProduct());
+                        Log.d("Data_menu"+i,menuResponse.getJiry());
+                        Log.d("Data_menu"+i,menuResponse.getBelki());
+                        Log.d("Data_menu"+i,menuResponse.getUglevod());
+                        Log.d("Data_menu"+i,menuResponse.getFa());
+                        Log.d("Data_menu"+i,menuResponse.getKl());
+                        Log.d("Data_menu"+i,menuResponse.getGram());
+                        if (dataBaseHelper.getMenuAndDate(menuResponse.getMenu(),menuResponse.getDate()).isEmpty()) {
+                            dataBaseHelper.insertIntoMenu(menuResponse.getMenu(), menuResponse.getDate(), menuResponse.getProduct(), menuResponse.getJiry(),
+                                    menuResponse.getBelki(), menuResponse.getUglevod(), menuResponse.getFa(), menuResponse.getKl(), menuResponse.getGram());
+                        }
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<List<MenuResponse>> call, Throwable t) {
-                Log.d("Tut","Ошибка при заходе в onResponse");
+                Log.e("Tut","Ошибка при заходе в onResponse");
                 Log.e("Tut", String.valueOf(t));
             }
         });
@@ -338,19 +324,23 @@ public class MainActivity extends AppCompatActivity
         call.enqueue(new Callback<List<DateMenuResponse>>() {
             @Override
             public void onResponse(Call<List<DateMenuResponse>> call, Response<List<DateMenuResponse>> response) {
-                Log.e("Tut", "Зашли в onResponse в getAllDateMenuApi()");
+                Log.d("Tut", "Зашли в onResponse в getAllDateMenuApi()");
                 if (response.isSuccessful()) {
-                    Log.e("Response", "Зашли в onResponse в getAllDateMenuApi() и прошли onSuccessful()"  );
+                    Log.d("Tut", "Зашли в onResponse в getAllDateMenuApi() и прошли onSuccessful()"  );
                     for (int i = 0; i < response.body().size(); i++) {
                         DateMenuResponse list = response.body().get(i);
-                        dataBaseHelper.insertMenuDates(list.getMenu(),list.getDate());
+                        Log.d("Data_date_menu", list.getDate());
+                        Log.d("Data_date_menu", list.getMenu());
+                        if (dataBaseHelper.getMenuAndDate(list.getMenu(),list.getDate()).isEmpty()) {
+                            dataBaseHelper.insertMenuDates(list.getMenu(), list.getDate());
+                        }
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<List<DateMenuResponse>> call, Throwable t) {
-                Log.d("Tut","Ошибка при заходе в onResponse в getAllDateMenuApi()");
+                Log.e("Tut","Ошибка при заходе в onResponse в getAllDateMenuApi()");
                 Log.e("Tut", String.valueOf(t));
             }
         });
@@ -362,21 +352,42 @@ public class MainActivity extends AppCompatActivity
        call.enqueue(new Callback<List<DateResponse>>() {
            @Override
            public void onResponse(Call<List<DateResponse>> call, Response<List<DateResponse>> response) {
-               Log.e("Tut", "Зашли в onResponse в getAllDateApi()");
+               Log.d("Tut", "Зашли в onResponse в getAllDateApi()");
                if (response.isSuccessful()) {
-                   Log.e("Response", "Зашли в onResponse в getAllDateApi() и прошли onSuccessful()"  );
+                   Log.d("Tut", "Зашли в onResponse в getAllDateApi() и прошли onSuccessful()"  );
                    for (int i = 0; i < response.body().size(); i++) {
                        DateResponse list = response.body().get(i);
-                       dataBaseHelper.insertDate(list.getDate());
+                       Log.d("Data_date", list.getDate());
+                       if (dataBaseHelper.getDates(list.getDate()).isEmpty()) {
+                           dataBaseHelper.insertDate(list.getDate());
+                       }
                    }
                }
            }
 
            @Override
            public void onFailure(Call<List<DateResponse>> call, Throwable t) {
-               Log.d("Tut","Ошибка при заходе в onResponse в getAllDateApi()");
+               Log.e("Tut","Ошибка при заходе в onResponse в getAllDateApi()");
                Log.e("Tut", String.valueOf(t));
            }
        });
+    }
+
+    private class UpdateLocalDbTasks extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getAllTasksApi();
+            getAllMenuApi();
+            getAllDateApi();
+            getAllDateMenuApi();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            progressDialog.dismiss();
+            setFragment(MainListFragment.class);
+        }
     }
 }
