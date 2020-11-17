@@ -26,6 +26,10 @@ public class TasksResponse {
     @Expose
     private String jiry;
 
+    @SerializedName("complicated")
+    @Expose
+    private String complicated;
+
     public String getName() {
         return name;
     }
@@ -72,5 +76,13 @@ public class TasksResponse {
 
     public void setJiry(String jiry) {
         this.jiry = jiry;
+    }
+
+    public String getComplicated() {
+        return complicated;
+    }
+
+    public void setComplicated(String complicated) {
+        this.complicated = complicated;
     }
 }

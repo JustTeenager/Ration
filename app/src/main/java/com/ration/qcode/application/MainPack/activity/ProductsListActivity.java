@@ -11,11 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.ration.qcode.application.MainPack.adapter.ComplicatedProductAdapter;
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
 import static com.ration.qcode.application.utils.Constants.DATE;
@@ -45,9 +48,9 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
     private ArrayList<String> kl;
     private ArrayList<String> gr;
 
-    private String[] masproducts;
-    private String[] parse1;
-    private String[] parse2;
+    private ArrayList<String> masproducts;
+    private List<String> parse1;
+    private List<String> parse2;
     String date, menu;
     Intent intentF;
 
@@ -69,20 +72,27 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
 
         initList();
         getall = dataBaseHelper.getALLProduct(intentF.getStringExtra(PROD_SEARCH));
+        parse1 = new ArrayList<>();
+        parse2 = new ArrayList<>();
         for (int i = 0; i < getall.size(); i++) {
-            parse1 = new String[getall.size()];
-            parse1 = getall.get(i).split("\\|");
+            parse1 = Arrays.asList(getall.get(i).split("\\|"));
+            Log.e("FIRST TIME PARSE1", String.valueOf(parse1));
 
-            parse2 = new String[getall.size() - 1];
-            parse2 = parse1[1].split("\\s+");
-            Log.e("parse1", parse1[0] + " " + parse2[0] + " " + parse2[1] + "");
-            setListData(parse1[0], parse2[2], parse2[1], parse2[3], parse2[4], parse2[5], parse2[6]);
+            parse2 = Arrays.asList(parse1.get(1).split("\\s+"));
+            //Log.e("parse1", parse1.get(0) + " " + parse2.get(0) + " " + parse2.get(1) + "");
+            Log.e("parse1_1", parse1.get(0));
+            Log.e("parse2_2", parse2.get(1));
+            Log.e("parse2_1", parse2.get(0));
+            Log.e("parse2_3", parse2.get(2));
+            Log.e("parse2_4", parse2.get(3));
+            Log.e("parse2_5", parse2.get(4));
+            Log.e("parse2_6", parse2.get(5));
+            setListData(parse1.get(0), parse2.get(2), parse2.get(1), parse2.get(3), parse2.get(4), parse2.get(5), parse2.get(6));
         }
         listViewProducts = (ListView) findViewById(R.id.listProducts);
         listViewProducts.setOnItemClickListener(this);
 
         setAdapterList();
-
     }
 
     private void initList() {
@@ -96,7 +106,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         kl = new ArrayList<>();
         gr = new ArrayList<>();
 
-        masproducts = new String[getall.size()];
+        masproducts = new ArrayList<>();
     }
 
     private void setListData(String products, String proteins, String fats, String carbohydrates,
@@ -127,7 +137,11 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent = new Intent(this, AddProductActivity.class);
+        Intent intent;
+        if (getIntent().getStringExtra(SearchComplicatedProductActivity.PROD_SEARCH_COMPL)==null) {
+            intent = new Intent(this, AddProductActivity.class);
+        }
+        else intent = new Intent(this, SearchComplicatedProductActivity.class);
         if (intentF.getStringExtra("From menu") != null) {
             this.date = intentF.getStringExtra(DATE);
             this.menu = intentF.getStringExtra(MENU);

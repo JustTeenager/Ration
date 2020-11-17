@@ -3,6 +3,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="product_title">Название продукта:</string>
     <string name="feedback">Обратная связь</string>
     <string name="delete_question">Вы уверены, что хотите удалить этот элемент?</string>
     <string name="yes">Да</string>

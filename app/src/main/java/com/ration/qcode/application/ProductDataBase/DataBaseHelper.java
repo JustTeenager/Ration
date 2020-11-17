@@ -19,6 +19,7 @@ import java.util.Collections;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String LOG = "DatabaseHelper";
+    private static final String COMPLICATED = "complicated";
     private static DataBaseHelper mInstance = null;
     private Context mCtx;
     private static final int DATABASE_VERSION = 1;
@@ -45,7 +46,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private SQLiteDatabase dbW;
     private SQLiteDatabase dbR;
 
-
+//
     private final String CREATE_TABLE_ALLPRODUCTS = "CREATE TABLE " + TABLE_ALLPRODUCTS + "(" +
             PRODUCT + " TEXT PRIMARY KEY, "
             + JIRY + " TEXT,"
@@ -53,7 +54,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             + BELKI + " TEXT,"
             + FA + " TEXT,"
             + KL + " TEXT,"
-            + GRAM + " TEXT)";
+            + GRAM + " TEXT,"
+            + COMPLICATED + " TEXT)";
 
     private final String CREATE_TABLE_ANALIZES = "CREATE TABLE " + TABLE_ANALIZES +
             "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -81,7 +83,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             + BELKI + " TEXT,"
             + FA + " TEXT,"
             + KL + " TEXT,"
-            + GRAM + " TEXT)";
+            + GRAM + " TEXT,"
+            + COMPLICATED + " TEXT)";
 
 
     public DataBaseHelper(Context context) {
@@ -112,7 +115,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void insertIntoMenu
             (String menu, String date, String product,
              String jiry, String belki,
-             String uglevod, String fa, String kl, String gram) {
+             String uglevod, String fa, String kl, String gram,String complicated) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -125,6 +128,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(FA, fa);
         values.put(KL, kl);
         values.put(GRAM, gram);
+        values.put(COMPLICATED,complicated);
         db.insertWithOnConflict(TABLE_MENU, null, values,SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
@@ -132,7 +136,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void insertIntoProduct
             (String product,
              String jiry, String belki,
-             String uglevod, String fa, String kl, String gram) {
+             String uglevod, String fa, String kl, String gram,String complicated) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -143,6 +147,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(FA, fa);
         values.put(KL, kl);
         values.put(GRAM, gram);
+        values.put(COMPLICATED,complicated);
         db.insertWithOnConflict(TABLE_ALLPRODUCTS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         Log.e("values", product);
         db.close();
@@ -163,7 +168,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + c.getString(c.getColumnIndex(UGLEVOD)) + " "
                     + c.getString(c.getColumnIndex(FA)) + " "
                     + c.getString(c.getColumnIndex(KL)) + " "
-                    + c.getString(c.getColumnIndex(GRAM)));
+                    + c.getString(c.getColumnIndex(GRAM))+ " "
+                    + c.getString(c.getColumnIndex(COMPLICATED)));
         }
         c.close();
         //  dbR.close();
@@ -238,7 +244,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                         + c.getString(c.getColumnIndex(UGLEVOD)) + " "
                         + c.getString(c.getColumnIndex(FA)) + " "
                         + c.getString(c.getColumnIndex(KL)) + " "
-                        + c.getString(c.getColumnIndex(GRAM)));
+                        + c.getString(c.getColumnIndex(GRAM))+" "
+                        + c.getString(c.getColumnIndex(COMPLICATED)));
                 Log.e("nu", all.get(c.getPosition()));
             }
             c.close();

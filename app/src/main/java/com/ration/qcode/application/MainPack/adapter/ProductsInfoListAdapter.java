@@ -41,7 +41,6 @@ public class ProductsInfoListAdapter extends ArrayAdapter {
         this.fas = fas;
         this.kl = kl;
         this.gr = gr;
-
     }
     @Override
     public View getView(final int position, View convertView, @NonNull final ViewGroup parent) {

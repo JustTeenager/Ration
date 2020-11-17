@@ -10,13 +10,11 @@ import retrofit2.http.POST;
  */
 
 public interface AddProductAPI {
-//    @POST("/insertproduct.php")
-//    Call<AddProductResponse> insertProduct(@Body AddProductBody addProductBody);
 
     @FormUrlEncoded
     @POST("/insertproduct.php")
     Call<AddProductResponse> insertProduct (@Field("name") String name, @Field("FA") String FA,
                                             @Field("KKAL") String KKAL, @Field("Belok") String Belok,
-                                            @Field("Uglevod") String Uglevod, @Field("Jiry") String Jiry);
+                                            @Field("Uglevod") String Uglevod, @Field("Jiry") String Jiry,@Field("complicated")  String complicated);
 
 }

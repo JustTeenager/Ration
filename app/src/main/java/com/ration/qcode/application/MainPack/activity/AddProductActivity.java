@@ -165,6 +165,8 @@ public class AddProductActivity extends AppCompatActivity {
                 ProductInfoActivity.fas.set(item, "" + fa);
                 ProductInfoActivity.kl.set(item, "" + kl);
                 ProductInfoActivity.gr.set(item, "" + gr);
+                ProductInfoActivity.isComplicated.set(item,"0");
+                Log.e("ITEM_U", String.valueOf(item));
             } else {
                 if (!textViewProducts.getText().toString().isEmpty()) {
                     intentProduct.putExtra("from Add", "yes");
@@ -175,6 +177,7 @@ public class AddProductActivity extends AppCompatActivity {
                     ProductInfoActivity.fas.add("" + fa);
                     ProductInfoActivity.kl.add("" + kl);
                     ProductInfoActivity.gr.add("" + gr);
+                    ProductInfoActivity.isComplicated.add("0");
                 }
             }
             intentProduct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -196,7 +199,10 @@ public class AddProductActivity extends AppCompatActivity {
             inten.putExtra(DATE, date);
         }
 
-        inten.putExtra(PROD_SEARCH, editSearch.getText().toString());
+        if (editSearch.getText().toString().isEmpty()) {
+            inten.putExtra(PROD_SEARCH, " ");
+        }
+        else inten.putExtra(PROD_SEARCH, editSearch.getText().toString());
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(inten);
     }
@@ -218,7 +224,10 @@ public class AddProductActivity extends AppCompatActivity {
         if (!editGram.getText().toString().isEmpty()) {
             double grams = Double.parseDouble(editGram.getText().toString());
             if (!textViewProducts.getText().toString().isEmpty()) {
+                Log.e("gr2=","gr100= "+ gr100);
+                Log.e("gr2=","proteins100= "+ proteins100);
                 proteins = proteins100 / gr100 * grams;
+                Log.e("gr2=","proteins= "+ proteins);
                 fats = fats100 / gr100 * grams;
                 carb = carb100 / gr100 * grams;
                 fa = fa100 / gr100 * grams;

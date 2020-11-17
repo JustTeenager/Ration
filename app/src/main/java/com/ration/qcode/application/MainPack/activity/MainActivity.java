@@ -77,6 +77,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         Log.e("MAINACTIVITY", MainActivity.class.toString());
         setContentView(R.layout.activity_main);
+        Gson gson = new GsonBuilder().setLenient().create();
+        retrofit = new Retrofit.Builder()
+                .baseUrl(MAIN_URL_CONST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle(getString(R.string.wait));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         dataBaseHelper = DataBaseHelper.getInstance(getApplicationContext());
@@ -236,16 +243,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void update() {
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle(getString(R.string.wait));
         progressDialog.show();
-
-        Gson gson = new GsonBuilder().setLenient().create();
-        retrofit = new Retrofit.Builder()
-                .baseUrl(MAIN_URL_CONST)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
         //getAllTasksApi();
         //getAllMenuApi();
         //getAllDateApi();
@@ -267,7 +265,7 @@ public class MainActivity extends AppCompatActivity
                         TasksResponse list = response.body().get(i);
                         dataBaseHelper.insertIntoProduct(list.getName() + "|", list.getBelok().replace(",", "."),
                                 list.getJiry().replace(",", "."), list.getUglevod().replace(",", "."),
-                                list.getFa().replace(",", "."), list.getKkal().replace(",", "."), "100");
+                                list.getFa().replace(",", "."), list.getKkal().replace(",", "."), "100","0");
                     }
                 }
             }
@@ -304,7 +302,7 @@ public class MainActivity extends AppCompatActivity
                         Log.d("Data_menu"+i,menuResponse.getGram());
                         if (dataBaseHelper.getMenuAndDate(menuResponse.getMenu(),menuResponse.getDate()).isEmpty()) {
                             dataBaseHelper.insertIntoMenu(menuResponse.getMenu(), menuResponse.getDate(), menuResponse.getProduct(), menuResponse.getJiry(),
-                                    menuResponse.getBelki(), menuResponse.getUglevod(), menuResponse.getFa(), menuResponse.getKl(), menuResponse.getGram());
+                                    menuResponse.getBelki(), menuResponse.getUglevod(), menuResponse.getFa(), menuResponse.getKl(), menuResponse.getGram(),menuResponse.getComplicated());
                         }
                     }
                 }

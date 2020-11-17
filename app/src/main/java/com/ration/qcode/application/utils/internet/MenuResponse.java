@@ -29,6 +29,9 @@ public class MenuResponse {
     private String kl;
     @Expose
     private String gram;
+    @SerializedName("complicated")
+    @Expose
+    private String complicated;
 
     public String getMenu() {
         return menu;
@@ -100,5 +103,13 @@ public class MenuResponse {
 
     public void setGram(String gram) {
         this.gram = gram;
+    }
+
+    public String getComplicated() {
+        return complicated;
+    }
+
+    public void setComplicated(String complicated) {
+        this.complicated = complicated;
     }
 }

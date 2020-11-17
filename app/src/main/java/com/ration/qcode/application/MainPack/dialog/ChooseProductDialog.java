@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.ration.qcode.application.MainPack.activity.AddProductActivity;
+import com.ration.qcode.application.MainPack.activity.SearchComplicatedProductActivity;
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
 import com.ration.qcode.application.R;
 
@@ -38,6 +39,14 @@ public class ChooseProductDialog extends DialogFragment {
                 .setPositiveButton(R.string.complicated_product, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent inten = new Intent(getActivity(), SearchComplicatedProductActivity.class);
+                        if (intent.getStringExtra("From menu") != null) {
+                            inten.putExtra("From menu", "yes");
+                            inten.putExtra(MENU, menu);
+                            inten.putExtra(DATE, date);
+                        }
+                        inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(inten);
                     }
                 })
                 .setNegativeButton(R.string.no_complicated_product, new DialogInterface.OnClickListener() {

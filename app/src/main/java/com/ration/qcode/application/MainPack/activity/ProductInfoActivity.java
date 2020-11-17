@@ -72,6 +72,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     public static ArrayList<String> fas = new ArrayList<>();
     public static ArrayList<String> kl = new ArrayList<>();
     public static ArrayList<String> gr = new ArrayList<>();
+    public static ArrayList<String> isComplicated = new ArrayList<>();
 
     private SwipeDetector swipeDetector;
     private ProductsInfoListAdapter adapter;
@@ -129,6 +130,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 String vseharasho = all.get(i);
                 String[] product = vseharasho.split("\\|");
                 String[] ochenydaje = product[1].split("\\s+");
+
                 products.add(product[0]);
                 proteins.add(ochenydaje[1]);
                 fats.add(ochenydaje[2]);
@@ -136,7 +138,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 fas.add(ochenydaje[4]);
                 kl.add(ochenydaje[5]);
                 gr.add(ochenydaje[6]);
-
+                isComplicated.add(ochenydaje[7]);
             }
             common();
 
@@ -182,18 +184,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         return super.onOptionsItemSelected(item);
     }
 
-    /*public void addProduct() {
-
-        Intent inten = new Intent(this, AddProductActivity.class);
-        if (intent.getStringExtra("From menu") != null) {
-            inten.putExtra("From menu", "yes");
-            inten.putExtra(MENU, menu);
-            inten.putExtra(DATE, date);
-        }
-        inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(inten);
-    }*/
-
     private void setAdapter() {
         adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
                 products, proteins, fats, carbohydrates, fas, kl, gr);
@@ -219,9 +209,9 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 insertInHostingIntoDateMenu(menu,date);
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
-                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                     insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
-                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i),isComplicated.get(i));
                 }
             }
         } else {
@@ -239,9 +229,9 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 }
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(timeNow, dateNow, products.get(i) + "|", fats.get(i), proteins.get(i),
-                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                     insertInHostingIntoMenu(timeNow, dateNow, products.get(i) + "|", fats.get(i), proteins.get(i),
-                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i));
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                 }
             }
         }
@@ -258,10 +248,10 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void insertInHostingIntoMenu(String menu, String date, String product, String fats, String proteins, String carbohydrates,
-                                         String fas, String kl, String gr) {
+                                         String fas, String kl, String gr,String complicated) {
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
                 .getMenuJSONApi()
-                .insertProduct(menu,date,product,fats, proteins,carbohydrates,fas,kl,gr)
+                .insertProduct(menu,date,product,fats, proteins,carbohydrates,fas,kl,gr,complicated)
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
@@ -331,7 +321,16 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 deleteFromList(i);
             }
         } else {
-            Intent inten = new Intent(this, AddProductActivity.class);
+
+            //TODO РАЗДЕЛЕНИЕ ХУЙНИ
+            Intent inten;
+            if (isComplicated.get(i).equals("1")){
+                inten=new Intent(this,SearchComplicatedProductActivity.class);
+            }
+            else inten = new Intent(this, AddProductActivity.class);
+
+
+
             if (intent.getStringExtra("From menu") != null) {
                 inten.putExtra("From menu", "yes");
                 inten.putExtra(MENU, menu);
@@ -369,6 +368,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                         fas.remove(position);
                         kl.remove(position);
                         gr.remove(position);
+                        isComplicated.remove(position);
 
                         adapter = new ProductsInfoListAdapter(getApplicationContext(),
                                 R.layout.productsinfo_list_item,
@@ -386,6 +386,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     public void clearAll() {
+        isComplicated.clear();
         products.clear();
         proteins.clear();
         fats.clear();

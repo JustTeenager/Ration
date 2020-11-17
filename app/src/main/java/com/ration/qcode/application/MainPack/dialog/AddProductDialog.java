@@ -104,7 +104,7 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
 
                                 NetworkService.getInstance(Constants.MAIN_URL_CONST)
                                         .getJSONApi()
-                                        .insertProduct(name, fa, kkal, belok, uglevod, jiry)
+                                        .insertProduct(name, fa, kkal, belok, uglevod, jiry, String.valueOf(0))
                                         .enqueue(
                                                 new Callback<AddProductResponse>() {
                                                     @Override
