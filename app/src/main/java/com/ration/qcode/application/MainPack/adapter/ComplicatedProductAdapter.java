@@ -26,6 +26,11 @@ import static com.ration.qcode.application.utils.Constants.PROTEINS;
 public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedProductAdapter.ProductHolder> {
 
     private Context mContext;
+
+    public ArrayList<Intent> getProductMaterials() {
+        return productMaterials;
+    }
+
     private ArrayList<Intent> productMaterials;
     private ArrayList<Double> listProteins;
     private ArrayList<Double> listFats;

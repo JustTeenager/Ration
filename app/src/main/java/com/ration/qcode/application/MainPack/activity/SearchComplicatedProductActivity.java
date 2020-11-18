@@ -1,5 +1,6 @@
 package com.ration.qcode.application.MainPack.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,22 +16,36 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import com.ration.qcode.application.MainPack.adapter.ComplicatedProductAdapter;
+import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
-
+import com.ration.qcode.application.utils.Constants;
+import com.ration.qcode.application.utils.NetworkService;
+import com.ration.qcode.application.utils.internet.AddProductResponse;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
 import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.DAY;
+import static com.ration.qcode.application.utils.Constants.FA;
+import static com.ration.qcode.application.utils.Constants.FATS;
+import static com.ration.qcode.application.utils.Constants.GR;
 import static com.ration.qcode.application.utils.Constants.HOUR;
 import static com.ration.qcode.application.utils.Constants.ID_PRODUCT;
 import static com.ration.qcode.application.utils.Constants.INFO;
+import static com.ration.qcode.application.utils.Constants.KL;
 import static com.ration.qcode.application.utils.Constants.MENU;
 import static com.ration.qcode.application.utils.Constants.MINUTE;
 import static com.ration.qcode.application.utils.Constants.MONTH;
 import static com.ration.qcode.application.utils.Constants.PRODUCTS;
 import static com.ration.qcode.application.utils.Constants.PROD_SEARCH;
+import static com.ration.qcode.application.utils.Constants.PROTEINS;
 import static com.ration.qcode.application.utils.Constants.YEAR;
 
 public class SearchComplicatedProductActivity extends AppCompatActivity {
@@ -96,8 +111,20 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             this.menu = intent.getStringExtra(MENU);
             Log.e("AddProductActivity", date + " " + menu);
         }
-
         updateUI();
+        if (intent.getStringExtra("From menu") != null){
+            Log.e("AddProductActivity", "VOSHLI");
+            //TODO по новой бд смотреть по имени список продуктов
+            ArrayList<Intent> intentsList=DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
+            Log.e("i", String.valueOf(intentsList.size()));
+            Log.e("i", intent.getStringExtra(PRODUCTS));
+            for (Intent intent:intentsList){
+                Log.e("Tut_intents", String.valueOf(intent));
+                adapter.addProduct(intent);
+                productRecView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
     private void updateUI(){
@@ -107,7 +134,8 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 adapter = new ComplicatedProductAdapter(this);
                 adapter.addProduct(intent);
                 productRecView.setAdapter(adapter);
-            } else {
+            }
+            else {
                 Log.e("Tut","continue adapter");
                 Log.e("Tut", String.valueOf(adapter.getItemCount()));
                 adapter.addProduct(intent);
@@ -129,10 +157,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             inten.putExtra(DATE, date);
         }
 
-        if (editTextSearch.getText().toString().isEmpty()) {
-            inten.putExtra(PROD_SEARCH, " ");
-        }
-        else inten.putExtra(PROD_SEARCH, editTextSearch.getText().toString());
+        inten.putExtra(PROD_SEARCH, editTextSearch.getText().toString());
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         inten.putExtra(PROD_SEARCH_COMPL,"YES");
         startActivity(inten);
@@ -278,11 +303,54 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     ProductInfoActivity.isComplicated.add("1");
                 Log.e("ITEM", String.valueOf(ProductInfoActivity.isComplicated.size()));
             }
+
+            for (Intent intent:adapter.getProductMaterials()){
+                DataBaseHelper.getInstance(this).insertIntoComplicated(productName,intent.getStringExtra(PRODUCTS),intent.getStringExtra(FATS),
+                        intent.getStringExtra(PROTEINS),intent.getStringExtra(CARBOHYDRATES),
+                        intent.getStringExtra(FA),intent.getStringExtra(KL),
+                        intent.getStringExtra(GR),"0");
+            }
+
+            DataBaseHelper.getInstance(this).insertIntoProduct(productName + "|",String.valueOf(fats),
+                    String.valueOf(proteins),String.valueOf(carb),String.valueOf(fa),String.valueOf(kl),String.valueOf(gr),"1");
+
+            Log.e("SOSI", String.valueOf(DataBaseHelper.getInstance(this).getALLProduct("229")));
+
+
+            addComplicatedProductOntoHosting(this,productName,String.valueOf(fa),
+                    String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats));
+
+
             intentProduct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intentProduct);
         } else {
             onBackPressed();
         }
         adapter=null;
+    }
+
+
+    private void addComplicatedProductOntoHosting(Context context, String name, String fa, String kkal, String belok, String uglevod, String jiry){
+        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+                .getJSONApi()
+                .insertProduct(name, fa, kkal, belok, uglevod, jiry, String.valueOf(1))
+                .enqueue(
+                        new Callback<AddProductResponse>() {
+                            @Override
+                            public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                                Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
+                                if (response.isSuccessful()) {
+                                    Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
+                                    if (response.body().getStatus().equals("ok")) {
+                                        Toast.makeText(context, response.body().getAnswer(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<AddProductResponse> call, Throwable t) {
+                                Log.e("ResponseFailure", t.getMessage());
+                            }
+                        });
     }
 }

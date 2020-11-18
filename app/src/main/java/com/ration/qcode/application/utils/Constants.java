@@ -9,6 +9,7 @@ public class Constants {
     public static String PROTEINS = "proteins";
     public static String FATS = "fats";
     public static String CARBOHYDRATES = "carbohydrates";
+    public static String COMPLICATED = "COMPLICATED";
     public static String FA = "fa";
     public static String KL = "kl";
     public static String GR = "gr";

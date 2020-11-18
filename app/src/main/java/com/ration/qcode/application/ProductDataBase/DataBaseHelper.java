@@ -2,11 +2,13 @@ package com.ration.qcode.application.ProductDataBase;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.internet.DateMenuResponse;
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String LOG = "DatabaseHelper";
     private static final String COMPLICATED = "complicated";
+    private static final String TABLE_COMPLICATED = "complicateds";
+    private static final String COMPLICATED_NAME = "Name";
     private static DataBaseHelper mInstance = null;
     private Context mCtx;
     private static final int DATABASE_VERSION = 1;
@@ -29,8 +33,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_MENU = "menus";
     public static final String TABLE_ANALIZES = "analizes";
     public static final String TABLE_ALLPRODUCTS = "products";
-
-
     private final String ID_MENU = "menu";
     private final String DATE = "date";
     private final String PRODUCT = "product";
@@ -41,12 +43,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private final String KL = "kl";
     private final String GRAM = "gram";
     private final String NOTICE = "notice";
-
-
     private SQLiteDatabase dbW;
     private SQLiteDatabase dbR;
 
-//
     private final String CREATE_TABLE_ALLPRODUCTS = "CREATE TABLE " + TABLE_ALLPRODUCTS + "(" +
             PRODUCT + " TEXT PRIMARY KEY, "
             + JIRY + " TEXT,"
@@ -86,6 +85,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             + GRAM + " TEXT,"
             + COMPLICATED + " TEXT)";
 
+    private final String CREATE_TABLE_COMPLICATED_PRODUCT = "CREATE TABLE " + TABLE_COMPLICATED +
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COMPLICATED_NAME + " TEXT,"
+            + PRODUCT + " TEXT,"
+            + JIRY + " TEXT,"
+            + UGLEVOD + " TEXT,"
+            + BELKI + " TEXT,"
+            + FA + " TEXT,"
+            + KL + " TEXT,"
+            + GRAM + " TEXT,"
+            + COMPLICATED + " TEXT)";
+
 
     public DataBaseHelper(Context context) {
         super(context, "DATABASE", null, DATABASE_VERSION);
@@ -99,6 +110,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_TABLE_MENU);
         sqLiteDatabase.execSQL(CREATE_TABLE_DATE);
         sqLiteDatabase.execSQL(CREATE_TABLE_ALLPRODUCTS);
+        sqLiteDatabase.execSQL(CREATE_TABLE_COMPLICATED_PRODUCT);
     }
 
     @Override
@@ -108,6 +120,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_ANALIZES);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_MENUES_DATES);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_DATE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_COMPLICATED);
 
         onCreate(sqLiteDatabase);
     }
@@ -133,6 +146,57 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public ArrayList<Intent> getFromComplicated(String name){
+        ArrayList<Intent> intentArrayList=new ArrayList<>();
+           String selectQuery = "SELECT * FROM "
+                    + TABLE_COMPLICATED + " WHERE Name LIKE '%" + name + "%'";
+        dbR = this.getReadableDatabase();
+        Cursor c = dbR.rawQuery(selectQuery, null);
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            Intent intent=new Intent();
+            intent.putExtra(Constants.PRODUCTS,c.getString(c.getColumnIndex(PRODUCT)));
+            intent.putExtra(Constants.PROTEINS,c.getString(c.getColumnIndex(BELKI)));
+            intent.putExtra(Constants.FATS,c.getString(c.getColumnIndex(JIRY)));
+            intent.putExtra(Constants.CARBOHYDRATES,c.getString(c.getColumnIndex(UGLEVOD)));
+            intent.putExtra(Constants.FA,c.getString(c.getColumnIndex(FA)));
+            intent.putExtra(Constants.KL,c.getString(c.getColumnIndex(KL)));
+            intent.putExtra(Constants.GR,c.getString(c.getColumnIndex(GRAM)));
+            intent.putExtra(Constants.COMPLICATED,c.getString(c.getColumnIndex(COMPLICATED)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(PRODUCT)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(BELKI)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(JIRY)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(UGLEVOD)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(FA)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(KL)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(GRAM)));
+            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(COMPLICATED)));
+            intentArrayList.add(intent);
+        }
+        c.close();
+
+        return intentArrayList;
+    }
+
+    public void insertIntoComplicated
+            (String name, String product,
+             String jiry, String belki,
+             String uglevod, String fa, String kl, String gram,String complicated) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COMPLICATED_NAME, name);
+        values.put(PRODUCT, product);
+        values.put(JIRY, jiry);
+        values.put(UGLEVOD, uglevod);
+        values.put(BELKI, belki);
+        values.put(FA, fa);
+        values.put(KL, kl);
+        values.put(GRAM, gram);
+        values.put(COMPLICATED,complicated);
+        db.insertWithOnConflict(TABLE_COMPLICATED, null, values,SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+    }
+
     public void insertIntoProduct
             (String product,
              String jiry, String belki,
@@ -149,7 +213,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(GRAM, gram);
         values.put(COMPLICATED,complicated);
         db.insertWithOnConflict(TABLE_ALLPRODUCTS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        Log.e("values", product);
         db.close();
     }
 
@@ -157,8 +220,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public ArrayList<String> getALLProduct(String query) {
         ArrayList<String> all = new ArrayList<>();
 
-        String selectQuery = "SELECT * FROM "
-                + TABLE_ALLPRODUCTS + " WHERE product LIKE '%" + query + "%'";
+        String selectQuery;
+        if (query==null || query.isEmpty()) {
+            selectQuery = "SELECT * FROM "
+                    + TABLE_ALLPRODUCTS + " WHERE product LIKE '%" + query + "%'";
+        }
+        else{
+            selectQuery = "SELECT * FROM "
+                    + TABLE_ALLPRODUCTS;
+        }
         dbR = this.getReadableDatabase();
         Cursor c = dbR.rawQuery(selectQuery, null);
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {

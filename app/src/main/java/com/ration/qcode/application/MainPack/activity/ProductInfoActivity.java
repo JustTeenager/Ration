@@ -103,7 +103,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         textCarbohydrates = (TextView) findViewById(R.id.textCarbohydrates);
         textKilos = (TextView) findViewById(R.id.textKilos);
         textGramm = (TextView) findViewById(R.id.textGram);
-        textGramm = (TextView) findViewById(R.id.textGram);
         textFA = (TextView) findViewById(R.id.textFA);
 
 
@@ -333,6 +332,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
             if (intent.getStringExtra("From menu") != null) {
                 inten.putExtra("From menu", "yes");
+                inten.putExtra("TOCOMPL","true");
                 inten.putExtra(MENU, menu);
                 inten.putExtra(DATE, date);
             }

@@ -74,6 +74,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         getall = dataBaseHelper.getALLProduct(intentF.getStringExtra(PROD_SEARCH));
         parse1 = new ArrayList<>();
         parse2 = new ArrayList<>();
+        Log.e("size", String.valueOf(getall.size()));
         for (int i = 0; i < getall.size(); i++) {
             parse1 = Arrays.asList(getall.get(i).split("\\|"));
             Log.e("FIRST TIME PARSE1", String.valueOf(parse1));

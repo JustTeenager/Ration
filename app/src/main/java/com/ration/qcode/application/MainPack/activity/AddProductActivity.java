@@ -199,10 +199,8 @@ public class AddProductActivity extends AppCompatActivity {
             inten.putExtra(DATE, date);
         }
 
-        if (editSearch.getText().toString().isEmpty()) {
-            inten.putExtra(PROD_SEARCH, " ");
-        }
-        else inten.putExtra(PROD_SEARCH, editSearch.getText().toString());
+
+        inten.putExtra(PROD_SEARCH, editSearch.getText().toString());
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(inten);
     }
