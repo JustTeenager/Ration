@@ -112,37 +112,56 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             Log.e("AddProductActivity", date + " " + menu);
         }
         updateUI();
-        if (intent.getStringExtra("From menu") != null){
-            Log.e("AddProductActivity", "VOSHLI");
-            //TODO по новой бд смотреть по имени список продуктов
-            ArrayList<Intent> intentsList=DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
-            Log.e("i", String.valueOf(intentsList.size()));
-            Log.e("i", intent.getStringExtra(PRODUCTS));
-            for (Intent intent:intentsList){
-                Log.e("Tut_intents", String.valueOf(intent));
-                adapter.addProduct(intent);
-                productRecView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-            }
-        }
     }
 
     private void updateUI(){
-        if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null) {
+        //Просто создание
+        if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null && intent.getStringExtra("COMPL")==null) {
             if (adapter == null) {
                 Log.e("Tut","CreateNewAdapter");
                 adapter = new ComplicatedProductAdapter(this);
-                adapter.addProduct(intent);
-                productRecView.setAdapter(adapter);
+            }
+            adapter.addProduct(intent);
+            productRecView.setAdapter(adapter);
+        }
+
+
+
+        //распаковка сложного продукта
+        else if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null && intent.getStringExtra("COMPL")!=null) {
+            Log.e("ELSE","VOSHLI");
+            if (adapter == null) {
+                Log.e("Tut", "CreateNewAdapter_2");
+                adapter = new ComplicatedProductAdapter(this);
+
+
+
+                ArrayList<Intent> intentsList = DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
+                productNameEditText.setText(intent.getStringExtra(PRODUCTS));
+                Log.e("iNTENT", String.valueOf(intentsList.size()));
+                Log.e("iNTENT", intent.getStringExtra(PRODUCTS));
+                for (Intent intent : intentsList) {
+                    Log.e("Tut_intents", String.valueOf(intent));
+                    adapter.addProduct(intent);
+                    productRecView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                }
             }
             else {
-                Log.e("Tut","continue adapter");
-                Log.e("Tut", String.valueOf(adapter.getItemCount()));
-                adapter.addProduct(intent);
-                productRecView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+                    Log.e("Tut", "VOSHLI_2");
+                    //TODO по новой бд смотреть по имени список продуктов
+                    ArrayList<Intent> intentsList = DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
+                    Log.e("iNTENT", String.valueOf(intentsList.size()));
+                    Log.e("iNTENT", intent.getStringExtra(PRODUCTS));
+                    productNameEditText.setText(intent.getStringExtra(PRODUCTS));
+                    for (Intent intent : intentsList) {
+                        adapter.addProduct(intent);
+                        productRecView.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+                    }
             }
         }
+
     }
 
     public void searchProduct(View view) {
@@ -224,30 +243,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         adapter=null;
     }
 
-    /*private void calculation() {
-        if (productRecView.getAdapter().getItemCount()>0) {
-            double grams = Double.parseDouble(editGram.getText().toString());
-            if (!textViewProducts.getText().toString().isEmpty()) {
-                proteins = proteins100 / gr100 * grams;
-                fats = fats100 / gr100 * grams;
-                carb = carb100 / gr100 * grams;
-                fa = fa100 / gr100 * grams;
-                kl = kl100 / gr100 * grams;
-                gr = grams;
-
-                textViewProteins.setText(decimalFormat.format(proteins));
-                textViewFats.setText(decimalFormat.format(fats));
-                textViewCarbohydrates.setText(decimalFormat.format(carb));
-                textViewFA.setText(decimalFormat.format(fa));
-                textViewKl.setText(decimalFormat.format(kl));
-                textViewGr.setText(decimalFormat.format(grams));
-
-                textBelLevel.setText(getString(R.string.proteins_level) + "\n" + decimalFormat.format(proteins));
-                textFALevel.setText(getString(R.string.fa_level) + "\n" + decimalFormat.format(fa));
-            }
-        }
-    }*/
-
 
 
     private boolean dateOfPay() {
@@ -301,21 +296,21 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     ProductInfoActivity.kl.add("" + kl);
                     ProductInfoActivity.gr.add("" + gr);
                     ProductInfoActivity.isComplicated.add("1");
-                Log.e("ITEM", String.valueOf(ProductInfoActivity.isComplicated.size()));
             }
 
             for (Intent intent:adapter.getProductMaterials()){
-                DataBaseHelper.getInstance(this).insertIntoComplicated(productName,intent.getStringExtra(PRODUCTS),intent.getStringExtra(FATS),
-                        intent.getStringExtra(PROTEINS),intent.getStringExtra(CARBOHYDRATES),
-                        intent.getStringExtra(FA),intent.getStringExtra(KL),
-                        intent.getStringExtra(GR),"0");
+                if (!DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,intent.getStringExtra(PRODUCTS)))
+                {
+                    Log.e("IF_CHECK","HERE");
+                    DataBaseHelper.getInstance(this).insertIntoComplicated(productName, intent.getStringExtra(PRODUCTS), intent.getStringExtra(FATS),
+                            intent.getStringExtra(PROTEINS), intent.getStringExtra(CARBOHYDRATES),
+                            intent.getStringExtra(FA), intent.getStringExtra(KL),
+                            intent.getStringExtra(GR), "0");
+                }
             }
 
             DataBaseHelper.getInstance(this).insertIntoProduct(productName + "|",String.valueOf(fats),
                     String.valueOf(proteins),String.valueOf(carb),String.valueOf(fa),String.valueOf(kl),String.valueOf(gr),"1");
-
-            Log.e("SOSI", String.valueOf(DataBaseHelper.getInstance(this).getALLProduct("229")));
-
 
             addComplicatedProductOntoHosting(this,productName,String.valueOf(fa),
                     String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats));

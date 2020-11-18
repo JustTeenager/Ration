@@ -325,6 +325,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             Intent inten;
             if (isComplicated.get(i).equals("1")){
                 inten=new Intent(this,SearchComplicatedProductActivity.class);
+                inten.putExtra("COMPL","true");
             }
             else inten = new Intent(this, AddProductActivity.class);
 
@@ -332,7 +333,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
             if (intent.getStringExtra("From menu") != null) {
                 inten.putExtra("From menu", "yes");
-                inten.putExtra("TOCOMPL","true");
                 inten.putExtra(MENU, menu);
                 inten.putExtra(DATE, date);
             }

@@ -177,6 +177,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return intentArrayList;
     }
 
+    public boolean getCheckFromComplicated(String name,String product){
+        String selectQuery = "SELECT * FROM "
+                + TABLE_COMPLICATED + " WHERE Name LIKE '%" + name + "%' AND " +"(" + PRODUCT + ") = '"+product+ "'";
+        dbR = this.getReadableDatabase();
+        Cursor c = dbR.rawQuery(selectQuery, null);
+        Log.e("Tut_count", String.valueOf(c.getCount()));
+        boolean bool= c.getCount() > 0;
+        c.close();
+        return bool;
+    }
+
     public void insertIntoComplicated
             (String name, String product,
              String jiry, String belki,
