@@ -2,6 +2,7 @@ package com.ration.qcode.application.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ration.qcode.application.utils.internet.AddComplicatedAPI;
 import com.ration.qcode.application.utils.internet.AddDateAPI;
 import com.ration.qcode.application.utils.internet.AddMenuAPI;
 import com.ration.qcode.application.utils.internet.AddMenuDateAPI;
@@ -47,4 +48,6 @@ public class NetworkService {
     public AddMenuDateAPI getMenuDateJSONApi(){
         return mRetrofit.create(AddMenuDateAPI.class);
     }
+
+    public AddComplicatedAPI getComplicatedApi(){return mRetrofit.create(AddComplicatedAPI.class);}
 }

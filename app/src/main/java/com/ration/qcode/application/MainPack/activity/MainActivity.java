@@ -28,9 +28,12 @@ import com.ration.qcode.application.MainPack.fragment.FeedbackFragment;
 import com.ration.qcode.application.MainPack.fragment.MainListFragment;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
+import com.ration.qcode.application.utils.AdapterUpdatable;
 import com.ration.qcode.application.utils.Constants;
+import com.ration.qcode.application.utils.internet.ComplicatedResponse;
 import com.ration.qcode.application.utils.internet.DateMenuResponse;
 import com.ration.qcode.application.utils.internet.DateResponse;
+import com.ration.qcode.application.utils.internet.IGetAllComplicatedAPI;
 import com.ration.qcode.application.utils.internet.IGetAllDataAPI;
 import com.ration.qcode.application.utils.internet.IGetAllDateAPI;
 import com.ration.qcode.application.utils.internet.IGetAllMenuAPI;
@@ -72,6 +75,8 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences preferences;
     private Retrofit retrofit;
 
+    private AdapterUpdatable mUpdatable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,14 +94,14 @@ public class MainActivity extends AppCompatActivity
         dataBaseHelper = DataBaseHelper.getInstance(getApplicationContext());
 
         preferences = getPreferences(MODE_PRIVATE);
+        setFragment(MainListFragment.class);
         if(!preferences.getString("DOWNLOAD", "").equals("false")) {
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("DOWNLOAD", "false");
             ed.commit();
-            //update();
-            new UpdateLocalDbTasks().execute();
+            update();
+            //new UpdateLocalDbTasks().execute();
         }
-        else setFragment(MainListFragment.class);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -118,6 +123,7 @@ public class MainActivity extends AppCompatActivity
         try {
 
             fragment = (Fragment) fragmentClass.newInstance();
+            mUpdatable= (AdapterUpdatable) fragment;
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.FlContent, fragment).commit();
         } catch (InstantiationException e) {
@@ -175,6 +181,7 @@ public class MainActivity extends AppCompatActivity
             FragmentClass = FeedbackFragment.class;
         } else if (id == R.id.nav_update) {
             update();
+
         } else if (id == R.id.nav_insert) {
             callDialogInsertProduct();
         } else if (id == R.id.nav_bill) {
@@ -244,14 +251,19 @@ public class MainActivity extends AppCompatActivity
 
     public void update() {
         progressDialog.show();
-        //getAllTasksApi();
-        //getAllMenuApi();
-        //getAllDateApi();
-        //getAllDateMenuApi();
-        progressDialog.dismiss();
+        Thread thread=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getAllTasksApi();
+                getAllMenuApi();
+                getComplicatedMenu();
+                getAllDateApi();
+                getAllDateMenuApi();
+            }
+        });
+        thread.run();
     }
 
-    //TODO: надо выледить 2 метода enqueue в отдельный поток и потом их синхронизировать
     private void getAllTasksApi() {
         IGetAllDataAPI allTasksApi = retrofit.create(IGetAllDataAPI.class);
         Call<List<TasksResponse>> call = allTasksApi.getAllTasks();
@@ -268,6 +280,7 @@ public class MainActivity extends AppCompatActivity
                                 list.getFa().replace(",", "."), list.getKkal().replace(",", "."), "100","0");
                     }
                 }
+                mUpdatable.updateAdapter();
             }
 
             @Override
@@ -278,7 +291,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    //TODO: тут сделать добавление меню во внутреннюю БД из хостинга
     private void getAllMenuApi() {
         IGetAllMenuAPI allMenuAPI = retrofit.create(IGetAllMenuAPI.class);
         Call<List<MenuResponse>> menuResponses = allMenuAPI.getAllMenu();
@@ -305,6 +317,7 @@ public class MainActivity extends AppCompatActivity
                                     menuResponse.getBelki(), menuResponse.getUglevod(), menuResponse.getFa(), menuResponse.getKl(), menuResponse.getGram(),menuResponse.getComplicated());
                         }
                     }
+                    mUpdatable.updateAdapter();
                 }
             }
 
@@ -314,6 +327,45 @@ public class MainActivity extends AppCompatActivity
                 Log.e("Tut", String.valueOf(t));
             }
         });
+    }
+
+    private void getComplicatedMenu(){
+        IGetAllComplicatedAPI complicatedAPI=retrofit.create(IGetAllComplicatedAPI.class);
+        Call<List<ComplicatedResponse>> call=complicatedAPI.queryComplicated();
+        call.enqueue(new Callback<List<ComplicatedResponse>>() {
+            @Override
+            public void onResponse(Call<List<ComplicatedResponse>> call, Response<List<ComplicatedResponse>> response) {
+                Log.d("Tut", "Зашли в onResponse");
+                if (response.isSuccessful()){
+                    Log.d("Tut", String.valueOf(response.body().size()));
+                    Log.d("Tut","Запрос удался, начинаем считывание данных");
+                    for (int i = 0; i < response.body().size(); i++) {
+                        ComplicatedResponse complicatedResponse = response.body().get(i);
+                        Log.d("Data_menu"+i,complicatedResponse.getName());
+                        Log.d("Data_menu"+i,complicatedResponse.getProduct());
+                        Log.d("Data_menu"+i,complicatedResponse.getJiry());
+                        Log.d("Data_menu"+i,complicatedResponse.getBelki());
+                        Log.d("Data_menu"+i,complicatedResponse.getUglevod());
+                        Log.d("Data_menu"+i,complicatedResponse.getFa());
+                        Log.d("Data_menu"+i,complicatedResponse.getKl());
+                        Log.d("Data_menu"+i,complicatedResponse.getGram());
+                            dataBaseHelper.insertIntoComplicated
+                                    (complicatedResponse.getName(), complicatedResponse.getProduct(), complicatedResponse.getJiry(),
+                                    complicatedResponse.getBelki(), complicatedResponse.getUglevod(), complicatedResponse.getFa(),
+                                            complicatedResponse.getKl(), complicatedResponse.getGram(),complicatedResponse.getComplicated());
+                    }
+                    mUpdatable.updateAdapter();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ComplicatedResponse>> call, Throwable t) {
+
+            }
+        });
+
+
+
     }
 
     private void getAllDateMenuApi() {
@@ -333,6 +385,7 @@ public class MainActivity extends AppCompatActivity
                             dataBaseHelper.insertMenuDates(list.getMenu(), list.getDate());
                         }
                     }
+                    mUpdatable.updateAdapter();
                 }
             }
 
@@ -360,7 +413,9 @@ public class MainActivity extends AppCompatActivity
                            dataBaseHelper.insertDate(list.getDate());
                        }
                    }
+                   mUpdatable.updateAdapter();
                }
+               progressDialog.dismiss();
            }
 
            @Override
@@ -369,23 +424,5 @@ public class MainActivity extends AppCompatActivity
                Log.e("Tut", String.valueOf(t));
            }
        });
-    }
-
-    private class UpdateLocalDbTasks extends AsyncTask<Void,Void,Void>{
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            getAllTasksApi();
-            getAllMenuApi();
-            getAllDateApi();
-            getAllDateMenuApi();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            progressDialog.dismiss();
-            setFragment(MainListFragment.class);
-        }
     }
 }

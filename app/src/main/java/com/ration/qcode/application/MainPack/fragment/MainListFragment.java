@@ -14,12 +14,13 @@ import com.ration.qcode.application.MainPack.activity.ProductInfoActivity;
 import com.ration.qcode.application.MainPack.adapter.MainListAdapter;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
+import com.ration.qcode.application.utils.AdapterUpdatable;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainListFragment extends Fragment {
+public class MainListFragment extends Fragment implements AdapterUpdatable {
 
     DataBaseHelper DB;
     private static final int TYPE_ITEM = 0;
@@ -37,8 +38,9 @@ public class MainListFragment extends Fragment {
     private ArrayList<String> fas;
     private ArrayList<String> belas;
     private ArrayList<String> kls;
-
     private ArrayList<String> sortB;
+
+    private MainListAdapter mainAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,12 +49,8 @@ public class MainListFragment extends Fragment {
 
 
         listMain = (ListView) view.findViewById(R.id.listMain);
-        DB = DataBaseHelper.getInstance(getActivity());
-        setListData();
-        MainListAdapter mainAdapter = new MainListAdapter(getActivity(),
-                R.layout.main_list_item, faAll, timeDate, proteinsAll, KLAll, eatingTypeList, fasList,
-                bel, kl);
-        listMain.setAdapter(mainAdapter);
+        updateAdapter();
+
 
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
@@ -152,4 +150,15 @@ public class MainListFragment extends Fragment {
             BeAll = 0;
         }
     }
+
+    public void updateAdapter(){
+        DB = DataBaseHelper.getInstance(getActivity());
+        setListData();
+        mainAdapter = new MainListAdapter(getActivity(),
+                R.layout.main_list_item, faAll, timeDate, proteinsAll, KLAll, eatingTypeList, fasList,
+                bel, kl);
+        listMain.setAdapter(mainAdapter);
+    }
+
+
 }

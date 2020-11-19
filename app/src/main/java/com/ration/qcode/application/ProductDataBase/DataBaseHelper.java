@@ -162,14 +162,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             intent.putExtra(Constants.KL,c.getString(c.getColumnIndex(KL)));
             intent.putExtra(Constants.GR,c.getString(c.getColumnIndex(GRAM)));
             intent.putExtra(Constants.COMPLICATED,c.getString(c.getColumnIndex(COMPLICATED)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(PRODUCT)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(BELKI)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(JIRY)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(UGLEVOD)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(FA)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(KL)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(GRAM)));
-            Log.e("BASE_INTENT",c.getString(c.getColumnIndex(COMPLICATED)));
             intentArrayList.add(intent);
         }
         c.close();
@@ -182,9 +174,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 + TABLE_COMPLICATED + " WHERE Name LIKE '%" + name + "%' AND " +"(" + PRODUCT + ") = '"+product+ "'";
         dbR = this.getReadableDatabase();
         Cursor c = dbR.rawQuery(selectQuery, null);
-        Log.e("Tut_count", String.valueOf(c.getCount()));
+        //Log.e("Tut_count", String.valueOf(c.getCount()));
         boolean bool= c.getCount() > 0;
         c.close();
+        dbR.close();
         return bool;
     }
 

@@ -8,12 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ration.qcode.application.R;
+import com.ration.qcode.application.utils.AdapterUpdatable;
 
 /**
  * Created by deepdev on 05.04.17.
  */
 
-public class FeedbackFragment extends Fragment {
+public class FeedbackFragment extends Fragment implements AdapterUpdatable {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -23,4 +24,8 @@ public class FeedbackFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void updateAdapter() {
+
+    }
 }

@@ -18,6 +18,7 @@ import com.ration.qcode.application.MainPack.adapter.AnalyzesListAdapter;
 import com.ration.qcode.application.MainPack.dialog.AddAnalysisDialog;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
+import com.ration.qcode.application.utils.AdapterUpdatable;
 import com.ration.qcode.application.utils.SwipeDetector;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
  */
 
 public class AnalyzesListFragment extends Fragment implements AdapterView.OnItemClickListener,
-        AddAnalysisDialog.OnReceivedData {
+        AddAnalysisDialog.OnReceivedData, AdapterUpdatable {
 
     private ArrayList<String> analyzes;
     private ArrayList<String> timeDate;
@@ -143,5 +144,10 @@ public class AnalyzesListFragment extends Fragment implements AdapterView.OnItem
         listMain.setAdapter(adapter);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(this).attach(this).commit();
+    }
+
+    @Override
+    public void updateAdapter() {
+
     }
 }

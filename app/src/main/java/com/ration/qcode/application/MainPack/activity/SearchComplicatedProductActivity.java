@@ -116,6 +116,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
     private void updateUI(){
         //Просто создание
+
         if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null && intent.getStringExtra("COMPL")==null) {
             if (adapter == null) {
                 Log.e("Tut","CreateNewAdapter");
@@ -297,23 +298,39 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     ProductInfoActivity.gr.add("" + gr);
                     ProductInfoActivity.isComplicated.add("1");
             }
+            Context context=this;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (Intent intent:adapter.getProductMaterials()){
+                        if (!DataBaseHelper.getInstance(context).getCheckFromComplicated(productName,intent.getStringExtra(PRODUCTS)))
+                        {
 
-            for (Intent intent:adapter.getProductMaterials()){
-                if (!DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,intent.getStringExtra(PRODUCTS)))
-                {
-                    Log.e("IF_CHECK","HERE");
-                    DataBaseHelper.getInstance(this).insertIntoComplicated(productName, intent.getStringExtra(PRODUCTS), intent.getStringExtra(FATS),
-                            intent.getStringExtra(PROTEINS), intent.getStringExtra(CARBOHYDRATES),
-                            intent.getStringExtra(FA), intent.getStringExtra(KL),
-                            intent.getStringExtra(GR), "0");
+                            Log.e("IF_CHECK","HERE");
+                            DataBaseHelper.getInstance(context).insertIntoComplicated(productName, intent.getStringExtra(PRODUCTS), intent.getStringExtra(FATS),
+                                    intent.getStringExtra(PROTEINS), intent.getStringExtra(CARBOHYDRATES),
+                                    intent.getStringExtra(FA), intent.getStringExtra(KL),
+                                    intent.getStringExtra(GR), "0");
+
+                            insertInHostingIntoComplicated(productName, intent.getStringExtra(PRODUCTS), intent.getStringExtra(FATS),
+                                    intent.getStringExtra(PROTEINS), intent.getStringExtra(CARBOHYDRATES),
+                                    intent.getStringExtra(FA), intent.getStringExtra(KL),
+                                    intent.getStringExtra(GR), "0");
+                        }
+                    }
                 }
-            }
+            }).start();
 
-            DataBaseHelper.getInstance(this).insertIntoProduct(productName + "|",String.valueOf(fats),
-                    String.valueOf(proteins),String.valueOf(carb),String.valueOf(fa),String.valueOf(kl),String.valueOf(gr),"1");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    DataBaseHelper.getInstance(context).insertIntoProduct(productName + "|",String.valueOf(fats),
+                            String.valueOf(proteins),String.valueOf(carb),String.valueOf(fa),String.valueOf(kl),String.valueOf(gr),"1");
 
-            addComplicatedProductOntoHosting(this,productName,String.valueOf(fa),
-                    String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats));
+                    addComplicatedProductOntoHosting(context,productName,String.valueOf(fa),
+                            String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats));
+                }
+            }).start();
 
 
             intentProduct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -322,6 +339,28 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             onBackPressed();
         }
         adapter=null;
+    }
+
+    private void insertInHostingIntoComplicated(String name,String productName,String jiry,String belki,String uglevod,String fa,String kl,String gram,String complicated){
+        Log.e("name_check",name);
+        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+                .getComplicatedApi()
+                .insertComplicated(name,productName,jiry,belki,uglevod,fa,kl,gram,complicated)
+                .enqueue(new Callback<AddProductResponse>() {
+                    @Override
+                    public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body().getStatus().equals("ok")) {
+                                Log.d("Response","Меню добавлено");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<AddProductResponse> call, Throwable t) {
+
+                    }
+                });
     }
 
 
