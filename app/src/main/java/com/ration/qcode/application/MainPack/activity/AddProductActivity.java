@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
+import static com.ration.qcode.application.utils.Constants.COMPLICATED;
 import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.DAY;
 import static com.ration.qcode.application.utils.Constants.FA;
@@ -44,13 +46,13 @@ import static com.ration.qcode.application.utils.Constants.YEAR;
 
 public class AddProductActivity extends AppCompatActivity {
 
-    Intent from_menu;
     private EditText editSearch, editGram;
     private TextView textViewProducts, textViewProteins, textViewFats, textViewCarbohydrates,
             textViewFA, textViewKl, textViewGr, textFALevel, textBelLevel;
     private Intent intent;
     private DecimalFormat decimalFormat;
     private double proteins = 0, fats, carb, fa, kl, gr;
+    private String isComplicated;
 
     private double proteins100, fats100, carb100, fa100, kl100, gr100;
     private String menu, date;
@@ -116,6 +118,7 @@ public class AddProductActivity extends AppCompatActivity {
             fa = Double.parseDouble(intent.getStringExtra(FA));
             kl = Double.parseDouble(intent.getStringExtra(KL));
             gr = Double.parseDouble(intent.getStringExtra(GR));
+            isComplicated=intent.getStringExtra(COMPLICATED);
 
             proteins100 = proteins;
             fats100 = fats;
@@ -163,7 +166,9 @@ public class AddProductActivity extends AppCompatActivity {
                 ProductInfoActivity.fas.set(item, "" + fa);
                 ProductInfoActivity.kl.set(item, "" + kl);
                 ProductInfoActivity.gr.set(item, "" + gr);
-                ProductInfoActivity.isComplicated.set(item,"0");
+                ProductInfoActivity.isComplicated.set(item,"" + isComplicated);
+
+
             } else {
                 if (!textViewProducts.getText().toString().isEmpty()) {
                     intentProduct.putExtra("from Add", "yes");
@@ -174,7 +179,7 @@ public class AddProductActivity extends AppCompatActivity {
                     ProductInfoActivity.fas.add("" + fa);
                     ProductInfoActivity.kl.add("" + kl);
                     ProductInfoActivity.gr.add("" + gr);
-                    ProductInfoActivity.isComplicated.add("0");
+                    ProductInfoActivity.isComplicated.add(""+isComplicated);
                 }
             }
             intentProduct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

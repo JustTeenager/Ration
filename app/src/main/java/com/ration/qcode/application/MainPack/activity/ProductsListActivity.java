@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
+import static com.ration.qcode.application.utils.Constants.COMPLICATED;
 import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.FA;
 import static com.ration.qcode.application.utils.Constants.FATS;
@@ -48,7 +49,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
     private ArrayList<String> kl;
     private ArrayList<String> gr;
 
-    private ArrayList<String> masproducts;
+    private ArrayList<String> isComplicated;
     private List<String> parse1;
     private List<String> parse2;
     String date, menu;
@@ -77,7 +78,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
             parse1 = Arrays.asList(getall.get(i).split("\\|"));
 
             parse2 = Arrays.asList(parse1.get(1).split("\\s+"));
-            setListData(parse1.get(0), parse2.get(2), parse2.get(1), parse2.get(3), parse2.get(4), parse2.get(5), parse2.get(6));
+            setListData(parse1.get(0), parse2.get(2), parse2.get(1), parse2.get(3), parse2.get(4), parse2.get(5), parse2.get(6),parse2.get(7));
         }
         listViewProducts = (ListView) findViewById(R.id.listProducts);
         listViewProducts.setOnItemClickListener(this);
@@ -96,11 +97,11 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         kl = new ArrayList<>();
         gr = new ArrayList<>();
 
-        masproducts = new ArrayList<>();
+        isComplicated = new ArrayList<>();
     }
 
     private void setListData(String products, String proteins, String fats, String carbohydrates,
-                             String fas, String kl, String gr) {
+                             String fas, String kl, String gr,String complicated) {
         this.products.add(products);
         this.proteins.add(proteins);
         this.fats.add(fats);
@@ -108,6 +109,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         this.fas.add(fas);
         this.kl.add(kl);
         this.gr.add(gr);
+        this.isComplicated.add(complicated);
     }
 
     private void setAdapterList() {
@@ -146,6 +148,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         intent.putExtra(FA, fas.get(i));
         intent.putExtra(KL, kl.get(i));
         intent.putExtra(GR, gr.get(i));
+        intent.putExtra(COMPLICATED,isComplicated.get(i));
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

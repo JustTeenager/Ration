@@ -41,6 +41,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
+import static com.ration.qcode.application.utils.Constants.COMPLICATED;
 import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.FA;
 import static com.ration.qcode.application.utils.Constants.FATS;
@@ -348,6 +349,9 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         } else {
 
             Intent inten;
+            Log.e("Tut_FA",fas.get(i));
+            Log.e("Tut_i", String.valueOf(i));
+            Log.e("Tut_nullComplicated", String.valueOf(isComplicated.get(i)==null));
             if (isComplicated.get(i).equals("1")){
                 inten=new Intent(this,SearchComplicatedProductActivity.class);
                 inten.putExtra("COMPL","true");
@@ -369,6 +373,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             inten.putExtra(FA, fas.get(i));
             inten.putExtra(KL, kl.get(i));
             inten.putExtra(GR, gr.get(i));
+            inten.putExtra(COMPLICATED,isComplicated.get(i));
             inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(inten);
         }

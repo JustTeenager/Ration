@@ -1,10 +1,7 @@
 package com.ration.qcode.application.utils;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
-import java.util.logging.Logger;
 
 /**
  * Created by deepdev on 06.04.17.
