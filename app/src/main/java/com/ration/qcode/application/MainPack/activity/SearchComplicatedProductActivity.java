@@ -28,7 +28,6 @@ import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
-import com.ration.qcode.application.utils.internet.RemoveFromMenu;
 import com.ration.qcode.application.utils.internet.UpdateGrAPI;
 
 import java.text.DecimalFormat;
@@ -116,7 +115,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 productName=productNameEditText.getText().toString();
-                Log.e("gr=",productName);
             }
         });
         productRecView= (RecyclerView) findViewById(R.id.product_rec_view);
@@ -126,7 +124,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         if (intent.getStringExtra("From menu") != null) {
             this.date = intent.getStringExtra(DATE);
             this.menu = intent.getStringExtra(MENU);
-            Log.e("AddProductActivity", date + " " + menu);
         }
         updateUI();
     }
@@ -135,7 +132,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         //Просто создание
         if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null && intent.getStringExtra("COMPL")==null) {
             if (adapter == null) {
-                Log.e("Tut","CreateNewAdapter");
                 adapter = new ComplicatedProductAdapter(this);
             }
             adapter.addProduct(intent);
@@ -146,30 +142,21 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
         //распаковка сложного продукта
         else if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null && intent.getStringExtra("COMPL")!=null) {
-            Log.e("ELSE","VOSHLI");
             if (adapter == null) {
-                Log.e("Tut", "CreateNewAdapter_2");
                 adapter = new ComplicatedProductAdapter(this);
 
 
 
                 ArrayList<Intent> intentsList = DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
                 productNameEditText.setText(intent.getStringExtra(PRODUCTS));
-                Log.e("iNTENT", String.valueOf(intentsList.size()));
                 for (Intent intent : intentsList) {
-                    Log.e("Tut_intents", String.valueOf(intent));
                     adapter.addProduct(intent);
-                    Log.e("iNTENT", intent.getStringExtra(GR));
                     productRecView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                 }
             }
             else {
-                Log.e("Tut", "VOSHLI_2");
-                //TODO по новой бд смотреть по имени список продуктов
                 ArrayList<Intent> intentsList = DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
-                Log.e("iNTENT", String.valueOf(intentsList.size()));
-                Log.e("iNTENT", intent.getStringExtra(PRODUCTS));
                 productNameEditText.setText(intent.getStringExtra(PRODUCTS));
                 for (Intent intent : intentsList) {
                     adapter.addProduct(intent);
@@ -188,7 +175,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             inten.putExtra("From menu", "yes");
             this.date = intent.getStringExtra(DATE);
             this.menu = intent.getStringExtra(MENU);
-            Log.e("AddProductActivity", date + " " + menu);
             inten.putExtra(MENU, menu);
             inten.putExtra(DATE, date);
         }
@@ -201,7 +187,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
     public void calculate(View view) {
         calculation();
-        //adapter=null;
     }
 
     private void calculation(){
@@ -219,27 +204,16 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             fa=0;
             kl=0;
             for (int i = 0; i < adapter.getItemCount(); i++) {
-                // ComplicatedProductAdapter.ProductHolder holder= (ComplicatedProductAdapter.ProductHolder) productRecView.findViewHolderForLayoutPosition(i);
-                // Log.e("Sentence", String.valueOf(holder!=null));
                 double grams = adapter.getListGr().get(i);
                 gr100=adapter.getListGr().get(i);
-                //proteins=holder.getProteins();
                 proteins100=adapter.getListProteins().get(i);
-                //fats=holder.getFats();
                 fats100=adapter.getListFats().get(i);
-                //carb=holder.getCarb();
                 carb100=adapter.getListCarb().get(i);
-                //fa=holder.getFa();
                 fa100=adapter.getListFa().get(i);
-                //kl=holder.getKl();
                 kl100=adapter.getListKl().get(i);
 
 
-                Log.e("gr1=","from calc "+i+": "+grams);
-                Log.e("gr1=","gr100= "+ gr100);
-                Log.e("gr1=","proteins100= "+ proteins100);
                 proteins += proteins100 / 100 * grams;
-                Log.e("gr1=","proteins= "+ proteins);
                 fats += fats100 / 100 * grams;
                 carb += carb100 / 100 * grams;
                 fa += fa100 / 100 * grams;
@@ -305,8 +279,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 ProductInfoActivity.kl.set(item, "" + kl);
                 ProductInfoActivity.gr.set(item, "" + gr);
                 ProductInfoActivity.isComplicated.set(item,"1");
-                Log.e("ITEM_C", String.valueOf(item));
-                Log.e("ITEM", String.valueOf(ProductInfoActivity.isComplicated.size()));
             } else {
                 intentProduct.putExtra("from Add", "yes");
                 ProductInfoActivity.products.add(productName);
@@ -322,7 +294,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             for (int i=0;i<adapter.getItemCount();i++){
                 if (!DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS)))
                 {
-                    Log.e("IF_CHECK","HERE");
                     DataBaseHelper.getInstance(this).insertIntoComplicated(productName, adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),adapter.getProductMaterials().get(i).getStringExtra(FATS),
                             adapter.getProductMaterials().get(i).getStringExtra(PROTEINS), adapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
                             adapter.getProductMaterials().get(i).getStringExtra(FA), adapter.getProductMaterials().get(i).getStringExtra(KL),
@@ -332,7 +303,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 }
 
                 else if(DataBaseHelper.getInstance(this).getCheckGrFromComplicated(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(adapter.getListGr().get(i)))){
-                    //TODO update Сервера (бд => хостинг)
                     DataBaseHelper.getInstance(this).updateGrams(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(adapter.getListFats().get(i)),String.valueOf(adapter.getListProteins().get(i)),String.valueOf(adapter.getListCarb().get(i)),String.valueOf(adapter.getListFa().get(i)),String.valueOf(adapter.getListKl().get(i)),String.valueOf(adapter.getListGr().get(i)));
                     updateGrIntoHosting(i);
                 }
@@ -364,9 +334,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         new Callback<AddProductResponse>() {
                             @Override
                             public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                                Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                 if (response.isSuccessful()) {
-                                    Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                     if (response.body().getStatus().equals("ok")) {
                                         Toast.makeText(context, response.body().getAnswer(), Toast.LENGTH_SHORT).show();
                                     }
@@ -374,9 +342,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void onFailure(Call<AddProductResponse> call, Throwable t) {
-                                Log.e("ResponseFailure", t.getMessage());
-                            }
+                            public void onFailure(Call<AddProductResponse> call, Throwable t) {}
                         });
     }
 
@@ -388,9 +354,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         new Callback<AddProductResponse>() {
                             @Override
                             public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                                Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                 if (response.isSuccessful()) {
-                                    Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                     if (response.body().getStatus().equals("ok")) {
                                         Toast.makeText(context, response.body().getAnswer(), Toast.LENGTH_SHORT).show();
                                     }
@@ -399,7 +363,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
                             @Override
                             public void onFailure(Call<AddProductResponse> call, Throwable t) {
-                                Log.e("ResponseFailure", t.getMessage());
                             }
                         });
     }
@@ -415,14 +378,10 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    Log.e("Vseharasho3","ochenydaje");
-                }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.e("Vseharasho3","посоcали");
             }
         });
     }

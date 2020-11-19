@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -60,7 +59,6 @@ public class AddProductActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_product_activity);
-        Log.e("ADD_PRODUCT_ACTIVITY", AddProductActivity.class.toString());
 
         decimalFormat = new DecimalFormat("#.##");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_top);
@@ -108,7 +106,7 @@ public class AddProductActivity extends AppCompatActivity {
         if (intent.getStringExtra("From menu") != null) {
             this.date = intent.getStringExtra(DATE);
             this.menu = intent.getStringExtra(MENU);
-            Log.e("AddProductActivity", date + " " + menu);
+
         }
         if (intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null) {
 
@@ -166,7 +164,6 @@ public class AddProductActivity extends AppCompatActivity {
                 ProductInfoActivity.kl.set(item, "" + kl);
                 ProductInfoActivity.gr.set(item, "" + gr);
                 ProductInfoActivity.isComplicated.set(item,"0");
-                Log.e("ITEM_U", String.valueOf(item));
             } else {
                 if (!textViewProducts.getText().toString().isEmpty()) {
                     intentProduct.putExtra("from Add", "yes");
@@ -194,7 +191,6 @@ public class AddProductActivity extends AppCompatActivity {
             inten.putExtra("From menu", "yes");
             this.date = intent.getStringExtra(DATE);
             this.menu = intent.getStringExtra(MENU);
-            Log.e("AddProductActivity", date + " " + menu);
             inten.putExtra(MENU, menu);
             inten.putExtra(DATE, date);
         }
@@ -222,10 +218,7 @@ public class AddProductActivity extends AppCompatActivity {
         if (!editGram.getText().toString().isEmpty()) {
             double grams = Double.parseDouble(editGram.getText().toString());
             if (!textViewProducts.getText().toString().isEmpty()) {
-                Log.e("gr2=","gr100= "+ gr100);
-                Log.e("gr2=","proteins100= "+ proteins100);
                 proteins = proteins100 / gr100 * grams;
-                Log.e("gr2=","proteins= "+ proteins);
                 fats = fats100 / gr100 * grams;
                 carb = carb100 / gr100 * grams;
                 fa = fa100 / gr100 * grams;

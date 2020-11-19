@@ -44,7 +44,6 @@ public class MainListFragment extends Fragment implements AdapterUpdatable {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e("MAIN_LIST_FRAGMENT", MainListFragment.class.toString());
         View view = inflater.inflate(R.layout.main_list_frament, container, false);
 
 
@@ -89,7 +88,6 @@ public class MainListFragment extends Fragment implements AdapterUpdatable {
         ArrayList<String> dateslist;
         ArrayList<String> datesmenulistLAST;
         dateslist = DB.getDates();
-        Log.e("datelist", dateslist + "");
         String Split[];
         double FA = 0, FAall = 0, BeAll = 0, Belki = 0, KL = 0, KLaLL = 0;
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
@@ -97,13 +95,11 @@ public class MainListFragment extends Fragment implements AdapterUpdatable {
 
         for (int i = 0; i < dateslist.size(); i++) {
             timeDate.add(dateslist.get(i));
-            Log.e("datelist", dateslist.get(i));
             int sizemenu = DB.getMenues(dateslist.get(i)).size(); // размер
             datesmenulistLAST = DB.getMenues(dateslist.get(i));
 
-            Log.e("datemenu", datesmenulistLAST + "");/// / значения
             for (int j = 0; j < sizemenu; j++) {
-                Log.d("MASS",""+datesmenulistLAST.get(j));
+
                 sortB = (DB.getMenu1screen(dateslist.get(i), datesmenulistLAST.get(j)));
 
                 for (int c = 0; c < sortB.size(); c++) {

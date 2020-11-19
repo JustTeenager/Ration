@@ -44,7 +44,6 @@ public class AnalyzesListFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e("ANALYZES_LIST_FRAGMENT", AnalyzesListFragment.class.toString());
         View view = inflater.inflate(R.layout.main_list_frament, container, false);
         db = DataBaseHelper.getInstance(getActivity());
         mFragment = this;
@@ -59,9 +58,7 @@ public class AnalyzesListFragment extends Fragment implements AdapterView.OnItem
         swipeDetector = new SwipeDetector();
         listMain.setOnTouchListener(swipeDetector);
         /*-----------------------------------------------------------*/
-        /*-----------------------------------------------------------*/
-        /*-----------------------------------------------------------*/
-        /*-----------------------------------------------------------*/
+
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +84,6 @@ public class AnalyzesListFragment extends Fragment implements AdapterView.OnItem
 
             String[] oneAll = all.get(i).split("\\s+");
             Date[i] = oneAll[1];
-            Log.e("DATE", Date[i] + "");
             analyzes.add(getString(R.string.fa) + " = " + oneAll[0]);
             timeDate.add(oneAll[1]);
             try {

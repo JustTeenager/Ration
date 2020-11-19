@@ -55,7 +55,6 @@ public class MainListAdapter extends ArrayAdapter<String> {
     private ListView listView;
     private int pos;
     String date;
-   // String[] menu;
 
 
     public MainListAdapter(Context context, int resource, List<String> faAll,
@@ -176,9 +175,6 @@ public class MainListAdapter extends ArrayAdapter<String> {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    Log.e("Vseharasho","ochenydaje");
-                }
             }
 
             @Override

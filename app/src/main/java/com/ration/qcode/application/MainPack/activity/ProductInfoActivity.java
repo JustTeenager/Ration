@@ -95,7 +95,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_info_activity);
-        Log.e("PRODICTION_INFO", ProductInfoActivity.class.toString());
 
         db = DataBaseHelper.getInstance(getApplicationContext());
 
@@ -127,8 +126,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         if (intent.getStringExtra("From menu") != null) {
             this.date = intent.getStringExtra(DATE);
             this.menu = intent.getStringExtra(MENU);
-            Log.e("PrpoductInfoActivity", date + " " + menu);
-            //   db.removeFromMenu(date, menu);
         }
 
         if (intent.getStringExtra(INFO) != null) {
@@ -173,7 +170,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              //  addProduct();
                 ChooseProductDialog dialog = new ChooseProductDialog(date,menu,intent);
                 dialog.show(getFragmentManager(),null);
                 setAdapter();
@@ -205,45 +201,34 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void removeFromHostingMenu(String date,String menu) {
-
-        Log.d("Vseharasho","запустилиУдаление");
         RemoveFromMenu removeFromMenu=mRetrofit.create(RemoveFromMenu.class);
         Call<String> call=removeFromMenu.removeFromMenu(menu,date);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.d("Vseharasho","запустили onResponse");
                 if (response.isSuccessful()) {
-                    Log.d("Vseharasho","ochenydaje");
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.e("Vseharasho","пососали");
-                Log.e("Vseharasho", String.valueOf(t));
             }
         });
     }
 
     private void removeFromHostingMenu(String date,String menu,String product) {
-        Log.d("Vseharasho2","запустилиУдаление");
 
         RemoveProductFromMenu removeProductFromMenu=mRetrofit.create(RemoveProductFromMenu.class);
         Call<String> call=removeProductFromMenu.removeProductFromMenu(menu,date,product);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.d("Vseharasho2","запустили onResponse");
                 if (response.isSuccessful()) {
-                    Log.d("Vseharasho2","ochenydaje");
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.e("Vseharasho2","пососали");
-                Log.e("Vseharasho2", String.valueOf(t));
             }
         });
     }
@@ -257,7 +242,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
             db.removeFromMenu(date, menu);
             removeFromHostingMenu(date,menu);
-            Log.e("MENU", String.valueOf(menu));
             if (!products.isEmpty()) {
                 if (!db.getDates().contains(date)) {
                     db.insertDate(date);
@@ -314,12 +298,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-
-                        if (response.isSuccessful()) {
-                            if (response.body().getStatus().equals("ok")) {
-                                Log.d("Response","Меню добавлено");
-                            }
-                        }
                     }
 
                     @Override
@@ -330,19 +308,12 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void insertInHostingIntoDate(String date){
-        Log.d("Response","Зашли в добавление даты" );
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
                 .getDateJSONApi()
                 .insertDate(date)
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                        Log.d("Response", "зашли в добавление даты");
-                        if (response.isSuccessful()) {
-                            if (response.body().getStatus().equals("ok")) {
-                                Log.d("Response","Дата добавлено");
-                            }
-                        }
                     }
 
                     @Override
@@ -359,11 +330,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                        if (response.isSuccessful()) {
-                            if (response.body().getStatus().equals("ok")) {
-                                Log.d("Response","Меню добавлено");
-                            }
-                        }
                     }
 
                     @Override
@@ -381,7 +347,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             }
         } else {
 
-            //TODO РАЗДЕЛЕНИЕ ХУЙНИ
             Intent inten;
             if (isComplicated.get(i).equals("1")){
                 inten=new Intent(this,SearchComplicatedProductActivity.class);
@@ -418,7 +383,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
                         db.removeFromMenu(date, menu, products.get(position) + "|");
                         removeFromHostingMenu(date,menu,products.get(position)+"|");
-                        Log.d("whoooo is this ", db.getProducts(date, menu) + "");
                         if (db.getProducts(date, menu).isEmpty()) {
                             db.removeFromMenu(date, menu);
                             removeFromHostingMenu(date,menu);

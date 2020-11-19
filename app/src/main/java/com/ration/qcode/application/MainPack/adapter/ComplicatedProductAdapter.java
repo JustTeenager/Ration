@@ -203,15 +203,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
                     if (editTextGr.getText().toString().isEmpty()) editTextGr.setText("0");
                     gr= Double.parseDouble(editTextGr.getText().toString());
                     listGr.set(postition,gr);
-                    /*Intent intent=new Intent();
-                    intent.putExtra(PROTEINS,proteins);
-                    intent.putExtra(FA,fa);
-                    intent.putExtra(GR,gr);
-                    intent.putExtra(FATS,fats);
-                    intent.putExtra(CARBOHYDRATES,carb);
-                    intent.putExtra(KL,kl);*/
                     productMaterials.get(postition).putExtra(GR,editTextGr.getText().toString());
-                    Log.e("gr=", String.valueOf(listGr.get(postition)));
                 }
             });
         }

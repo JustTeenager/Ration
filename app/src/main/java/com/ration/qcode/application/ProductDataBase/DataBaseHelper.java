@@ -174,7 +174,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 + TABLE_COMPLICATED + " WHERE Name LIKE '%" + name + "%' AND " +"(" + PRODUCT + ") = '"+product+ "'";
         dbR = this.getReadableDatabase();
         Cursor c = dbR.rawQuery(selectQuery, null);
-        //Log.e("Tut_count", String.valueOf(c.getCount()));
         boolean bool= c.getCount() > 0;
         c.close();
         dbR.close();
@@ -246,7 +245,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + c.getString(c.getColumnIndex(COMPLICATED)));
         }
         c.close();
-        //  dbR.close();
         return all;
     }
 
@@ -265,7 +263,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + c.getString(c.getColumnIndex(KL)));
         }
         c.close();
-        //  dbR.close();
         return all;
     }
 
@@ -279,7 +276,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             all.add(c.getString(c.getColumnIndex(DATE)));
         }
         c.close();
-        //  dbR.close();
         Collections.reverse(all);
         return all;
     }
@@ -295,7 +291,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             all.add(c.getString(c.getColumnIndex(DATE)));
         }
         c.close();
-        //  dbR.close();
         Collections.reverse(all);
         return all;
     }
@@ -320,10 +315,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                         + c.getString(c.getColumnIndex(KL)) + " "
                         + c.getString(c.getColumnIndex(GRAM))+" "
                         + c.getString(c.getColumnIndex(COMPLICATED)));
-                Log.e("nu", all.get(c.getPosition()));
             }
             c.close();
-            //  dbR.close();
         }
         return all;
     }
@@ -333,7 +326,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 + TABLE_COMPLICATED + " WHERE Name LIKE '%" + name + "%' AND " +"(" + PRODUCT + ") = '"+product+ "'"+" AND " +"("+GRAM+") = '"+gr+ "'";
         dbR = this.getReadableDatabase();
         Cursor c = dbR.rawQuery(selectQuery, null);
-        //Log.e("Tut_count", String.valueOf(c.getCount()));
         boolean bool= c.getCount() == 0;
         c.close();
         dbR.close();
@@ -355,7 +347,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 " AND "+"("+ PRODUCT + ") = '"+product+"'";
 
         dbW = this.getWritableDatabase();
-        Log.e("Tut","NE_GAVNINA");
         dbW.execSQL(selectQuery);
     }
 
@@ -368,9 +359,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
             all.add(c.getString(c.getColumnIndex(ID_MENU)));
         }
-        Log.e("DATE", date);
         c.close();
-        // dbR.close();
         return all;
     }
 
@@ -389,7 +378,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             all.add(response);
         }
         c.close();
-        // dbR.close();
         return all;
     }
 
@@ -397,7 +385,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         dbW = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DATE, date);
-        Log.e("dateBASE", date);
         dbW.insertWithOnConflict(TABLE_DATE, null, values,SQLiteDatabase.CONFLICT_REPLACE);
 
     }
@@ -408,7 +395,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(DATE, date);
         values.put(ID_MENU, menu);
         dbW.insertWithOnConflict(TABLE_MENUES_DATES, null, values,SQLiteDatabase.CONFLICT_REPLACE);
-        //  dbW.close();
     }
 
 
@@ -428,7 +414,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 dbW.execSQL(removeDate);
             }
         }
-        //dbW.close();
     }
 
 
@@ -439,7 +424,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + "(" + ID_MENU + ") = '" + menu + "' AND "
                     + "(" + PRODUCT + ") = '" + product + "'";
             dbW.execSQL(removeMenu);
-            Log.e("getMenus", getMenues(date) + "");
             if (getMenues(date).isEmpty()) {
 
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
@@ -457,7 +441,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         values.put(DATE, date);
         values.put(this.FA, FA);
         values.put(NOTICE, notice);
-        Log.e("dateBASE", date);
         dbW.insert(TABLE_ANALIZES, null, values);
 
     }
@@ -480,7 +463,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + c.getString(c.getColumnIndex(NOTICE)));
         }
         c.close();
-        // dbR.close();
         return all;
     }
 

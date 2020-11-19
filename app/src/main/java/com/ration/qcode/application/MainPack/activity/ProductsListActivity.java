@@ -58,7 +58,6 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.product_list_activity);
-        Log.e("PRODUCT_LIST_ACTIVITY", ProductsListActivity.class.toString());
         dataBaseHelper = DataBaseHelper.getInstance(getApplicationContext());
 
 
@@ -74,20 +73,10 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         getall = dataBaseHelper.getALLProduct(intentF.getStringExtra(PROD_SEARCH));
         parse1 = new ArrayList<>();
         parse2 = new ArrayList<>();
-        Log.e("size", String.valueOf(getall.size()));
         for (int i = 0; i < getall.size(); i++) {
             parse1 = Arrays.asList(getall.get(i).split("\\|"));
-            Log.e("FIRST TIME PARSE1", String.valueOf(parse1));
 
             parse2 = Arrays.asList(parse1.get(1).split("\\s+"));
-            //Log.e("parse1", parse1.get(0) + " " + parse2.get(0) + " " + parse2.get(1) + "");
-            Log.e("parse1_1", parse1.get(0));
-            Log.e("parse2_2", parse2.get(1));
-            Log.e("parse2_1", parse2.get(0));
-            Log.e("parse2_3", parse2.get(2));
-            Log.e("parse2_4", parse2.get(3));
-            Log.e("parse2_5", parse2.get(4));
-            Log.e("parse2_6", parse2.get(5));
             setListData(parse1.get(0), parse2.get(2), parse2.get(1), parse2.get(3), parse2.get(4), parse2.get(5), parse2.get(6));
         }
         listViewProducts = (ListView) findViewById(R.id.listProducts);
@@ -149,7 +138,6 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
             intent.putExtra("From menu", "MENU");
             intent.putExtra(MENU, menu);
             intent.putExtra(DATE, date);
-            Log.e("ListA", date + " " + menu);
         }
         intent.putExtra(PRODUCTS, products.get(i));
         intent.putExtra(PROTEINS, proteins.get(i));

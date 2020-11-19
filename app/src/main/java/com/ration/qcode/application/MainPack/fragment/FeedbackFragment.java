@@ -18,7 +18,6 @@ public class FeedbackFragment extends Fragment implements AdapterUpdatable {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.e("FEEDBACK_FRAGMENT", FeedbackFragment.class.toString());
         View view = inflater.inflate(R.layout.feedback_fragment, container, false);
 
         return view;

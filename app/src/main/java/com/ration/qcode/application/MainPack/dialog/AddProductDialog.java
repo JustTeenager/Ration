@@ -85,23 +85,6 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
                     if (validator.validetBelki(belok)) {
                         if (validator.validetUglevod(uglevod)) {
                             if (validator.validetJiry(jiry)) {
-
-
-//                                Retrofit retrofit = new Retrofit.Builder()
-//                                        .baseUrl(MAIN_URL_CONST)
-//                                        .addConverterFactory(GsonConverterFactory.create())
-//                                        .build();
-
-//                                AddProductAPI addProductAPI = retrofit.create(AddProductAPI.class);
-//                                Call<AddProductResponse> call = addProductAPI.insertProduct(name,fa,kkal,belok,uglevod,jiry);
-
-                                Log.d("Request", "name=" + name);
-                                Log.d("Request", "fa=" + fa);
-                                Log.d("Request", "kkal=" + kkal);
-                                Log.d("Request", "belok=" + belok);
-                                Log.d("Request", "uglevod=" + uglevod);
-                                Log.d("Request", "jiry=" + jiry);
-
                                 NetworkService.getInstance(Constants.MAIN_URL_CONST)
                                         .getJSONApi()
                                         .insertProduct(name, fa, kkal, belok, uglevod, jiry, String.valueOf(0))
@@ -109,9 +92,7 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
                                                 new Callback<AddProductResponse>() {
                                                     @Override
                                                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                                                        Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                                         if (response.isSuccessful()) {
-                                                            Log.d("Response", "status " + response.body().getStatus() + " answer " + response.body().getAnswer());
                                                             if (response.body().getStatus().equals("ok")) {
                                                                 Toast.makeText(getContext(), response.body().getAnswer(), Toast.LENGTH_SHORT).show();
                                                                 dismiss();
@@ -121,7 +102,6 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
 
                                                     @Override
                                                     public void onFailure(Call<AddProductResponse> call, Throwable t) {
-                                                        Log.e("ResponseFailure", t.getMessage());
                                                         dismiss();
                                                     }
                                                 });
