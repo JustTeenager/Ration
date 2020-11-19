@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -16,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -28,7 +27,6 @@ import com.ration.qcode.application.MainPack.fragment.MainListFragment;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.AdapterUpdatable;
-import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.internet.ComplicatedResponse;
 import com.ration.qcode.application.utils.internet.DateMenuResponse;
 import com.ration.qcode.application.utils.internet.DateResponse;
@@ -41,7 +39,6 @@ import com.ration.qcode.application.utils.internet.IGetPrice;
 import com.ration.qcode.application.utils.internet.MenuResponse;
 import com.ration.qcode.application.utils.internet.PriceResponse;
 import com.ration.qcode.application.utils.internet.TasksResponse;
-import com.yandex.money.api.methods.payment.params.P2pTransferParams;
 import com.yandex.money.api.methods.payment.params.PaymentParams;
 import com.yandex.money.api.methods.payment.params.PhoneParams;
 
@@ -97,8 +94,9 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("DOWNLOAD", "false");
             ed.commit();
-            update();
-            //new UpdateLocalDbTasks().execute();
+
+            new Async().execute();
+            //update();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -178,7 +176,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_support) {
             FragmentClass = FeedbackFragment.class;
         } else if (id == R.id.nav_update) {
-            update();
+            //update();
+            new Async().execute();
 
         } else if (id == R.id.nav_insert) {
             callDialogInsertProduct();
@@ -248,8 +247,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void update() {
-        progressDialog.show();
-        Thread thread=new Thread(new Runnable() {
+        getAllTasksApi();
+        getAllMenuApi();
+        getComplicatedMenu();
+        getAllDateApi();
+        getAllDateMenuApi();
+        /*Thread thread=new Thread(new Runnable() {
             @Override
             public void run() {
                 getAllTasksApi();
@@ -260,6 +263,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
         thread.run();
+        try {
+            thread.join();
+            progressDialog.dismiss();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
 
     private void getAllTasksApi() {
@@ -277,7 +286,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 mUpdatable.updateAdapter();
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
             }
 
             @Override
@@ -295,19 +304,22 @@ public class MainActivity extends AppCompatActivity
                 if (response.isSuccessful()){
                     for (int i = 0; i < response.body().size(); i++) {
                         MenuResponse menuResponse = response.body().get(i);
-                        if (dataBaseHelper.getMenuAndDate(menuResponse.getMenu(),menuResponse.getDate()).isEmpty()) {
+                        Log.e("Tut_belki",menuResponse.getBelki());
+                        Log.d("Tut_bool", String.valueOf(dataBaseHelper.getMenuAndDate(menuResponse.getMenu(),menuResponse.getDate()).isEmpty()));
+                        if (dataBaseHelper.getMenu(menuResponse.getMenu(),menuResponse.getDate(),menuResponse.getProduct()).isEmpty()) {
+                            Log.d("Tut_db",menuResponse.getBelki());
                             dataBaseHelper.insertIntoMenu(menuResponse.getMenu(), menuResponse.getDate(), menuResponse.getProduct(), menuResponse.getJiry(),
                                     menuResponse.getBelki(), menuResponse.getUglevod(), menuResponse.getFa(), menuResponse.getKl(), menuResponse.getGram(),menuResponse.getComplicated());
                         }
                     }
                     mUpdatable.updateAdapter();
                 }
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
+                Log.d("Tut", String.valueOf(dataBaseHelper.getMenu1screen("19.11.20","23:47")));
             }
 
             @Override
-            public void onFailure(Call<List<MenuResponse>> call, Throwable t) {
-            }
+            public void onFailure(Call<List<MenuResponse>> call, Throwable t) {}
         });
     }
 
@@ -327,7 +339,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     mUpdatable.updateAdapter();
                 }
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
             }
 
             @Override
@@ -355,7 +367,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     mUpdatable.updateAdapter();
                 }
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
             }
 
             @Override
@@ -379,12 +391,34 @@ public class MainActivity extends AppCompatActivity
                    }
                    mUpdatable.updateAdapter();
                }
-               progressDialog.dismiss();
+               //progressDialog.dismiss();
            }
 
            @Override
            public void onFailure(Call<List<DateResponse>> call, Throwable t) {
            }
        });
+    }
+
+
+    public class Async extends AsyncTask<Void,Void,Boolean>{
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            update();
+            return true;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean rez) {
+            super.onPostExecute(rez);
+            mUpdatable.updateAdapter();
+            if (rez) progressDialog.dismiss();
+        }
     }
 }

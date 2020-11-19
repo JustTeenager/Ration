@@ -28,13 +28,12 @@
     <string name="fa">ФА</string>
     <string name="main">Главная</string>
     <string name="analysis">Анализы</string>
-    <string name="update">Обновление базы</string>
+    <string name="update">Синхронизация</string>
     <string name="insert">Добавить продукт</string>
     <string name="payment">Оплата</string>
     <string name="wait">Подождите</string>
     <string name="payment_successful">Оплата успешна</string>
     <string name="menu">Меню</string>
-
     <string name="site">Наш сайт :</string>
     <string name="domein">https://www.fkusoft.ru</string>
     <string name="maintext">Для добавления Ваших\nпродуктов в базу\nпрограммы пришлите свои\nпродукты на почту</string>

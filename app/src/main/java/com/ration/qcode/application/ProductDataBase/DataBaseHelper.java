@@ -149,7 +149,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public ArrayList<Intent> getFromComplicated(String name){
         ArrayList<Intent> intentArrayList=new ArrayList<>();
            String selectQuery = "SELECT * FROM "
-                    + TABLE_COMPLICATED + " WHERE Name LIKE '%" + name + "%'";
+                    + TABLE_COMPLICATED + " WHERE Name = '" + name + "'";
         dbR = this.getReadableDatabase();
         Cursor c = dbR.rawQuery(selectQuery, null);
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
@@ -364,6 +364,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<DateMenuResponse> getMenuAndDate(String menu, String date) {
+       // Log.d("Tut_ID_MENU",ID_MENU);
+        Log.d("Tut_DATE",date);
+        Log.d("Tut_DATE_TRIM",date.trim());
+        Log.d("Tut_MENU",menu);
+        Log.d("Tut_MENU_TRIM",menu.trim());
         ArrayList<DateMenuResponse> all = new ArrayList<>();
         String selectQuery = "SELECT * FROM "
                 + TABLE_MENUES_DATES +
@@ -376,7 +381,36 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             response.setMenu(c.getString(c.getColumnIndex(ID_MENU)));
             response.setDate(c.getString(c.getColumnIndex(DATE)));
             all.add(response);
+            Log.e("Tut_response", String.valueOf(response.getDate())+"   "+response.getMenu());
         }
+        Log.d("Tut_size", String.valueOf(c.getCount()));
+        c.close();
+        return all;
+    }
+
+    public ArrayList<DateMenuResponse> getMenu(String menu, String date,String product) {
+        // Log.d("Tut_ID_MENU",ID_MENU);
+        Log.d("Tut_DATE",date);
+        Log.d("Tut_DATE_TRIM",date.trim());
+        Log.d("Tut_MENU",menu);
+        Log.d("Tut_MENU_TRIM",menu.trim());
+        ArrayList<DateMenuResponse> all = new ArrayList<>();
+        String selectQuery = "SELECT * FROM "
+                + TABLE_MENU +
+                " WHERE TRIM(" + ID_MENU + ") = '" + menu.trim() +
+                "' AND "
+                + "(" + DATE + ") = '" + date.trim() + "'"
+                + " AND " + "(" + PRODUCT + ") = '" + product.trim() + "'";
+        dbR = this.getReadableDatabase();
+        Cursor c = dbR.rawQuery(selectQuery, null);
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+            DateMenuResponse response = new DateMenuResponse();
+            response.setMenu(c.getString(c.getColumnIndex(ID_MENU)));
+            response.setDate(c.getString(c.getColumnIndex(DATE)));
+            all.add(response);
+            Log.e("Tut_response", String.valueOf(response.getDate())+"   "+response.getMenu());
+        }
+        Log.d("Tut_size", String.valueOf(c.getCount()));
         c.close();
         return all;
     }
@@ -425,7 +459,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + "(" + PRODUCT + ") = '" + product + "'";
             dbW.execSQL(removeMenu);
             if (getMenues(date).isEmpty()) {
-
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
             }
