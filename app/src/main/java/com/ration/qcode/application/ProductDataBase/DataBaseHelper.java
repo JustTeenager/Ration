@@ -115,12 +115,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_ALLPRODUCTS);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_MENU);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_ANALIZES);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_MENUES_DATES);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_DATE);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS" + TABLE_COMPLICATED);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ALLPRODUCTS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_MENU);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ANALIZES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_MENUES_DATES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DATE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLICATED);
 
         onCreate(sqLiteDatabase);
     }
@@ -328,6 +328,37 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return all;
     }
 
+    public boolean getCheckGrFromComplicated(String name,String product,String gr){
+        String selectQuery = "SELECT * FROM "
+                + TABLE_COMPLICATED + " WHERE Name LIKE '%" + name + "%' AND " +"(" + PRODUCT + ") = '"+product+ "'"+" AND " +"("+GRAM+") = '"+gr+ "'";
+        dbR = this.getReadableDatabase();
+        Cursor c = dbR.rawQuery(selectQuery, null);
+        //Log.e("Tut_count", String.valueOf(c.getCount()));
+        boolean bool= c.getCount() == 0;
+        c.close();
+        dbR.close();
+        return bool;
+    }
+
+    public void updateGrams(String name,String product,
+                            String jiry, String belki,
+                            String uglevod, String fa, String kl, String gram){
+
+        String selectQuery = "UPDATE "
+                + TABLE_COMPLICATED + " SET (" + GRAM + ") ='"+gram+
+                "', ("+ JIRY + ") ='"+jiry+
+                "', ("+ BELKI + ") ='"+belki+
+                "', ("+ UGLEVOD + ") ='"+uglevod+
+                "', ("+ FA + ") ='"+fa+
+                "', ("+ KL + ") ='"+kl+
+                "' WHERE "+"("+ COMPLICATED_NAME + ") = '"+name+"'"+
+                " AND "+"("+ PRODUCT + ") = '"+product+"'";
+
+        dbW = this.getWritableDatabase();
+        Log.e("Tut","NE_GAVNINA");
+        dbW.execSQL(selectQuery);
+    }
+
     public ArrayList<String> getMenues(String date) {
         ArrayList<String> all = new ArrayList<>();
         String selectQuery = "SELECT * FROM "
@@ -414,8 +445,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
             }
-        } catch (Exception e) {
         }
+        catch (Exception e) {}
 
     }
 

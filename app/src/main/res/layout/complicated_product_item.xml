@@ -1,107 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_marginTop="16dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
+    android:layout_height="match_parent">
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-
+        android:layout_height="match_parent">
         <TextView
             android:id="@+id/textViewProduct"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_weight="0.7"
-            android:layout_gravity="start"
-            android:text="ABCSD"
             android:textColor="@android:color/black"
-            android:textSize="15sp" />
-
+            android:textSize="15sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorGrey" />
-
+            android:background="@color/colorGrey"/>
         <TextView
             android:id="@+id/textViewProteins"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/black"
-            android:textSize="19sp" />
-
+            android:textSize="19sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorGrey" />
-
+            android:background="@color/colorGrey"/>
         <TextView
             android:id="@+id/textViewFats"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/black"
-            android:textSize="19sp" />
-
+            android:textSize="19sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorGrey" />
-
+            android:background="@color/colorGrey"/>
         <TextView
             android:id="@+id/textViewCarbohydrates"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/black"
-            android:textSize="19sp" />
-
+            android:textSize="19sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorGrey" />
-
+            android:background="@color/colorGrey"/>
         <TextView
             android:id="@+id/textViewFA"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/black"
-            android:textSize="19sp" />
-
+            android:textSize="19sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorGrey" />
-
+            android:background="@color/colorGrey"/>
         <TextView
-            android:id="@+id/textViewKl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/textViewKg"
             android:layout_weight="1"
             android:textColor="@android:color/black"
-            android:textSize="19sp" />
-
+            android:textSize="19sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/colorGrey" />
-
+            android:background="@color/colorGrey"/>
         <EditText
             android:id="@+id/edit_text_gr"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.95"
-            android:inputType="number"
-            android:layout_gravity="center|top"
+            android:layout_weight="1"
             android:textColor="@android:color/black"
-            android:textSize="12sp" />
+            android:textSize="15sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorGrey"/>
+
 </LinearLayout>

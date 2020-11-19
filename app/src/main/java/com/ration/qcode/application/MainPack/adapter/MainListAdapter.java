@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +14,26 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.activity.ProductInfoActivity;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.SwipeDetector;
+import com.ration.qcode.application.utils.internet.RemoveFromMenu;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.INFO;
+import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 import static com.ration.qcode.application.utils.Constants.MENU;
 
 public class MainListAdapter extends ArrayAdapter<String> {
@@ -133,7 +144,7 @@ public class MainListAdapter extends ArrayAdapter<String> {
 
                         date = timeDate.get(pos);
                         db.removeFromMenu(date, eatingType.get(pos).get(i));
-
+                        removeFromHostingMenu(i);
                         eatingType.get(pos).remove(i);
                         fas.get(pos).remove(i);
 
@@ -152,6 +163,29 @@ public class MainListAdapter extends ArrayAdapter<String> {
                 });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void removeFromHostingMenu(int i) {
+        Gson gson= new GsonBuilder().setLenient().create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MAIN_URL_CONST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        RemoveFromMenu removeFromMenu=retrofit.create(RemoveFromMenu.class);
+        Call<String> call=removeFromMenu.removeFromMenu(eatingType.get(pos).get(i),date);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Log.e("Vseharasho","ochenydaje");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
     }
 
     private void addtoList(final int i) {

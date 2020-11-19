@@ -99,6 +99,11 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
         return productMaterials.size();
     }
 
+
+
+
+
+
     public class ProductHolder extends RecyclerView.ViewHolder{
 
         public double getProteins() {
@@ -182,7 +187,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
             textViewFats = (TextView) itemView.findViewById(R.id.textViewFats);
             textViewCarbohydrates = (TextView) itemView.findViewById(R.id.textViewCarbohydrates);
             textViewFA = (TextView) itemView.findViewById(R.id.textViewFA);
-            textViewKl = (TextView) itemView.findViewById(R.id.textViewKl);
+            textViewKl = (TextView) itemView.findViewById(R.id.textViewKg);
             editTextGr = (EditText) itemView.findViewById(R.id.edit_text_gr);
             editTextGr.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -198,6 +203,14 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
                     if (editTextGr.getText().toString().isEmpty()) editTextGr.setText("0");
                     gr= Double.parseDouble(editTextGr.getText().toString());
                     listGr.set(postition,gr);
+                    /*Intent intent=new Intent();
+                    intent.putExtra(PROTEINS,proteins);
+                    intent.putExtra(FA,fa);
+                    intent.putExtra(GR,gr);
+                    intent.putExtra(FATS,fats);
+                    intent.putExtra(CARBOHYDRATES,carb);
+                    intent.putExtra(KL,kl);*/
+                    productMaterials.get(postition).putExtra(GR,editTextGr.getText().toString());
                     Log.e("gr=", String.valueOf(listGr.get(postition)));
                 }
             });

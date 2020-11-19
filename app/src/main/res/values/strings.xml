@@ -47,4 +47,5 @@
     <string name="choose_product">Выберете нужный продукт</string>
     <string name="complicated_product">составной</string>
     <string name="no_complicated_product">не составной</string>
+    <string name="enter_a_name">\"Введите имя продукта!\"</string>
 </resources>

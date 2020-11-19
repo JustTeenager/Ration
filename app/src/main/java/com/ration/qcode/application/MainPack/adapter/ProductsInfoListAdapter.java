@@ -56,7 +56,7 @@ public class ProductsInfoListAdapter extends ArrayAdapter {
         TextView textViewCarbohydrates = (TextView) convertView.findViewById(R.id.textViewCarbohydrates);
         TextView textViewFA = (TextView) convertView.findViewById(R.id.textViewFA);
         TextView textViewKL = (TextView) convertView.findViewById(R.id.textViewKg);
-        TextView textViewGR = (TextView) convertView.findViewById(R.id.textViewGr);
+        TextView textViewGR = (TextView) convertView.findViewById(R.id.edit_text_gr);
 
         textViewProduct.setText(products.get(position));
         textViewProteins.setText(decimalFormat.format(Double.parseDouble(proteins.get(position).replace(",", "."))));

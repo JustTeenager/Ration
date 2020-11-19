@@ -15,6 +15,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
 import com.ration.qcode.application.MainPack.dialog.ChooseProductDialog;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
@@ -23,6 +25,8 @@ import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
 import com.ration.qcode.application.utils.SwipeDetector;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
+import com.ration.qcode.application.utils.internet.RemoveFromMenu;
+import com.ration.qcode.application.utils.internet.RemoveProductFromMenu;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -33,6 +37,8 @@ import java.util.Date;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
 import static com.ration.qcode.application.utils.Constants.DATE;
@@ -42,6 +48,7 @@ import static com.ration.qcode.application.utils.Constants.GR;
 import static com.ration.qcode.application.utils.Constants.ID_PRODUCT;
 import static com.ration.qcode.application.utils.Constants.INFO;
 import static com.ration.qcode.application.utils.Constants.KL;
+import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 import static com.ration.qcode.application.utils.Constants.MENU;
 import static com.ration.qcode.application.utils.Constants.PRODUCTS;
 import static com.ration.qcode.application.utils.Constants.PROTEINS;
@@ -55,6 +62,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
     private TextView textProteins, textFats, textCarbohydrates, textKilos, textGramm, textFA;
     private ListView listViewProducts;
+    private Retrofit mRetrofit;
 
     DataBaseHelper db;
 
@@ -96,6 +104,12 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
+
+        Gson gson= new GsonBuilder().setLenient().create();
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(MAIN_URL_CONST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
 
 
         textProteins = (TextView) findViewById(R.id.textProteins);
@@ -190,6 +204,51 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         listViewProducts.setAdapter(adapter);
     }
 
+    private void removeFromHostingMenu(String date,String menu) {
+
+        Log.d("Vseharasho","запустилиУдаление");
+        RemoveFromMenu removeFromMenu=mRetrofit.create(RemoveFromMenu.class);
+        Call<String> call=removeFromMenu.removeFromMenu(menu,date);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("Vseharasho","запустили onResponse");
+                if (response.isSuccessful()) {
+                    Log.d("Vseharasho","ochenydaje");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("Vseharasho","пососали");
+                Log.e("Vseharasho", String.valueOf(t));
+            }
+        });
+    }
+
+    private void removeFromHostingMenu(String date,String menu,String product) {
+        Log.d("Vseharasho2","запустилиУдаление");
+
+        RemoveProductFromMenu removeProductFromMenu=mRetrofit.create(RemoveProductFromMenu.class);
+        Call<String> call=removeProductFromMenu.removeProductFromMenu(menu,date,product);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("Vseharasho2","запустили onResponse");
+                if (response.isSuccessful()) {
+                    Log.d("Vseharasho2","ochenydaje");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("Vseharasho2","пососали");
+                Log.e("Vseharasho2", String.valueOf(t));
+            }
+        });
+    }
+
+
     public void saveToDB(View view) {
         intent = getIntent();
         if (intent.getStringExtra("From menu") != null) {
@@ -197,6 +256,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             String menu = intent.getStringExtra(MENU);
 
             db.removeFromMenu(date, menu);
+            removeFromHostingMenu(date,menu);
             Log.e("MENU", String.valueOf(menu));
             if (!products.isEmpty()) {
                 if (!db.getDates().contains(date)) {
@@ -357,9 +417,11 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                     public void onClick(DialogInterface dialog, int id) {
 
                         db.removeFromMenu(date, menu, products.get(position) + "|");
+                        removeFromHostingMenu(date,menu,products.get(position)+"|");
                         Log.d("whoooo is this ", db.getProducts(date, menu) + "");
                         if (db.getProducts(date, menu).isEmpty()) {
                             db.removeFromMenu(date, menu);
+                            removeFromHostingMenu(date,menu);
                         }
 
                         products.remove(position);
