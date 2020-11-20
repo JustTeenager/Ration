@@ -233,9 +233,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<String> getALLProduct(String query) {
         ArrayList<String> all = new ArrayList<>();
-
         String selectQuery;
-        if (query==null || query.isEmpty()) {
+        if (query!=null && !query.isEmpty()) {
             selectQuery = "SELECT * FROM "
                     + TABLE_ALLPRODUCTS + " WHERE product LIKE '%" + query + "%'";
         }

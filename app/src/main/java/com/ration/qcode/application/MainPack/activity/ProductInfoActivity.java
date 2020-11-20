@@ -27,6 +27,7 @@ import com.ration.qcode.application.utils.SwipeDetector;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
 import com.ration.qcode.application.utils.internet.RemoveFromMenu;
 import com.ration.qcode.application.utils.internet.RemoveProductFromMenu;
+import com.ration.qcode.application.utils.internet.ReplaceMenuAPI;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -203,6 +204,25 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         listViewProducts.setAdapter(adapter);
     }
 
+    private void replaceFromHostingMenu(String date, String menu, String product, String s, String s1, String s2, String s3, String s4, String s5, String s6){
+        //TODO: написать скрипт и интерфейс
+        ReplaceMenuAPI replaceMenuAPI=mRetrofit.create(ReplaceMenuAPI.class);
+        Call<String> call=replaceMenuAPI.insertProduct(menu,date,product,s,s1,s2,s3,s4,s5,s6);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()){
+                    Log.e("Tut_REPLACED",response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
     private void removeFromHostingMenu(String date,String menu) {
         RemoveFromMenu removeFromMenu=mRetrofit.create(RemoveFromMenu.class);
         Call<String> call=removeFromMenu.removeFromMenu(menu,date);
@@ -244,7 +264,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             String menu = intent.getStringExtra(MENU);
 
             db.removeFromMenu(date, menu);
-            removeFromHostingMenu(date,menu);
+            //
             if (!products.isEmpty()) {
                 if (!db.getDates().contains(date)) {
                     db.insertDate(date);
@@ -252,12 +272,13 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 }
 
                 db.insertMenuDates(menu, date);
-                insertInHostingIntoDateMenu(menu,date);
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
-                    insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
-                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i),isComplicated.get(i));
+                  /*  insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i),isComplicated.get(i));*/
+                    replaceFromHostingMenu(date,menu,products.get(i) + "|",fats.get(i), proteins.get(i),
+                            carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                 }
             }
         } else {

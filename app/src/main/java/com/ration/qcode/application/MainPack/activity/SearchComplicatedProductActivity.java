@@ -375,11 +375,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         new Callback<AddProductResponse>() {
                             @Override
                             public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                                if (response.isSuccessful()) {
-                                    if (response.body().getStatus().equals("ok")) {
-                                        Toast.makeText(context, response.body().getAnswer(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
                             }
 
                             @Override
@@ -395,11 +390,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         new Callback<AddProductResponse>() {
                             @Override
                             public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                                if (response.isSuccessful()) {
-                                    if (response.body().getStatus().equals("ok")) {
-                                        Toast.makeText(context, response.body().getAnswer(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
                             }
 
                             @Override
