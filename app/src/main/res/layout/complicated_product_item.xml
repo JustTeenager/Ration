@@ -82,6 +82,7 @@
         <EditText
             android:id="@+id/edit_text_gr"
             android:layout_weight="1"
+            android:inputType="number"
             android:textColor="@android:color/black"
             android:textSize="15sp"
             android:gravity="center"

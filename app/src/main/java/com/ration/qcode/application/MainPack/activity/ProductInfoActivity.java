@@ -164,6 +164,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
         adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
                 products, proteins, fats, carbohydrates, fas, kl, gr);
+        Log.e("adapter_size", String.valueOf(adapter.getCount()));
         listViewProducts.setAdapter(adapter);
 
 
@@ -197,6 +198,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     private void setAdapter() {
         adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
                 products, proteins, fats, carbohydrates, fas, kl, gr);
+        Log.e("adapter_size_setAdapter", String.valueOf(adapter.getCount()));
         listViewProducts.setOnItemClickListener(this);
         listViewProducts.setAdapter(adapter);
     }
@@ -404,6 +406,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                         adapter = new ProductsInfoListAdapter(getApplicationContext(),
                                 R.layout.productsinfo_list_item,
                                 products, proteins, fats, carbohydrates, fas, kl, gr);
+                        Log.e("adapter_size_product", String.valueOf(adapter.getCount()));
                         listViewProducts.setAdapter(adapter);
                         common();
                     }

@@ -38,11 +38,15 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
     private ArrayList<Double> listFa;
     private ArrayList<Double> listKl;
     private ArrayList<Double> listGr;
+    private ArrayList<Integer> deletedPositionsList;
+
+    public ArrayList<Integer> getDeletedPositionsList() {
+        return deletedPositionsList;
+    }
 
     public ArrayList<Double> getListProteins() {
         return listProteins;
     }
-
     public ArrayList<Double> getListFats() {
         return listFats;
     }
@@ -77,6 +81,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
         listFa=new ArrayList<>();
         listKl =new ArrayList<>();
         listGr=new ArrayList<>();
+        deletedPositionsList=new ArrayList<>();
     }
 
     public void addProduct(Intent intent){
@@ -89,6 +94,24 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
         listGr.add(Double.parseDouble(intent.getStringExtra(GR)));
     }
 
+    public void removeProduct(int position){
+        //productMaterials.remove(position);
+        listProteins.remove(position);
+        listFats.remove(position);
+        listCarb.remove(position);
+        listFa.remove(position);
+        listKl.remove(position);
+        listGr.remove(position);
+        deletedPositionsList.add(position);
+        //notifyDataSetChanged();
+        notifyItemRemoved(position);
+    }
+
+    public void removeFromMaterials(int position){
+        productMaterials.remove(position);
+        notifyItemRemoved(position);
+    }
+
     @Override
     public void onBindViewHolder(ProductHolder holder, int position) {
         holder.bind(productMaterials.get(position),position);
@@ -96,7 +119,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
 
     @Override
     public int getItemCount() {
-        return productMaterials.size();
+        return listFa.size();
     }
 
 
@@ -104,7 +127,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
 
 
 
-    public class ProductHolder extends RecyclerView.ViewHolder{
+    public class ProductHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
 
         public double getProteins() {
             return proteins;
@@ -206,6 +229,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
                     productMaterials.get(postition).putExtra(GR,editTextGr.getText().toString());
                 }
             });
+            itemView.setOnLongClickListener(this);
         }
 
         public void bind(Intent intent, int position) {
@@ -235,6 +259,12 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
                 textViewKl.setText(decimalFormat.format(kl));
                 editTextGr.setText(decimalFormat.format(gr));
             }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            removeProduct(postition);
+            return true;
         }
     }
 }

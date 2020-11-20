@@ -443,7 +443,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + "(" + ID_MENU + ") = '" + menu + "'";
             dbW.execSQL(removeMenu);
             dbW.execSQL(removeMenuDates);
-            if (getMenues(date).isEmpty()) {
+            if (getMenues(date).isEmpty())
+            {
+                Log.e("MENU", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
             }
@@ -459,6 +461,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + "(" + PRODUCT + ") = '" + product + "'";
             dbW.execSQL(removeMenu);
             if (getMenues(date).isEmpty()) {
+                Log.e("MENU2", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
             }
@@ -466,6 +469,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         catch (Exception e) {}
 
     }
+
+    public void changeLocalDBAfterDeletingInRecView(String name,String product,
+                                                    String jiry, String belki,
+                                                    String uglevod, String fa, String kl, String gram) {
+        dbW = this.getWritableDatabase();
+
+        String removeCompl = "DELETE FROM " + TABLE_COMPLICATED + " WHERE (" + COMPLICATED_NAME + ") = '" + name + "' AND "
+                + "(" + PRODUCT + ") = '" + product + "'";
+        String updateProduct = "UPDATE " + TABLE_ALLPRODUCTS + " SET " +
+                "("+ JIRY + ") ='"+jiry+
+                "', ("+ BELKI + ") ='"+belki+
+                "', ("+ UGLEVOD + ") ='"+uglevod+
+                "', ("+ FA + ") ='"+fa+
+                "', ("+ KL + ") ='"+kl+"'"+
+                " WHERE (" + PRODUCT + ") = '" + name + "'";
+        dbW.execSQL(removeCompl);
+        dbW.execSQL(updateProduct);
+    }
+
 
 
     public void insertIntoAnalize(String date, String FA, String notice) {

@@ -135,7 +135,6 @@ public class AddProductActivity extends AppCompatActivity {
             textViewKl.setText(decimalFormat.format(kl));
             textViewGr.setText(decimalFormat.format(gr));
 
-
         }
     }
 
@@ -209,6 +208,7 @@ public class AddProductActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                Log.e("home","tapped");
                 onBackPressed();
                 break;
         }

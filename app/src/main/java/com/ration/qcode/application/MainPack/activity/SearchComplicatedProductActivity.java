@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,6 +30,7 @@ import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
 import com.ration.qcode.application.utils.internet.UpdateGrAPI;
+import com.ration.qcode.application.utils.internet.UpdateProductAPI;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -66,6 +68,8 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     private RecyclerView productRecView;
     private static ComplicatedProductAdapter adapter;
 
+    private Retrofit retrofit;
+
     private TextView textBelLevel;
     private TextView textFALevel;
 
@@ -82,6 +86,12 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_complicated_product);
+
+        Gson gson= new GsonBuilder().setLenient().create();
+        retrofit = new Retrofit.Builder()
+                .baseUrl(MAIN_URL_CONST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
         editTextSearch= (EditText) findViewById(R.id.editSearch);
         productNameEditText= (EditText) findViewById(R.id.product_name);
         searchProduct= (ImageView) findViewById(R.id.search_image_view);
@@ -212,7 +222,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 fa100=adapter.getListFa().get(i);
                 kl100=adapter.getListKl().get(i);
 
-
                 proteins += proteins100 / 100 * grams;
                 fats += fats100 / 100 * grams;
                 carb += carb100 / 100 * grams;
@@ -290,24 +299,54 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 ProductInfoActivity.gr.add("" + gr);
                 ProductInfoActivity.isComplicated.add("1");
             }
-
-            for (int i=0;i<adapter.getItemCount();i++){
-                if (!DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS)))
+//
+            ComplicatedProductAdapter complicatedProductAdapter= (ComplicatedProductAdapter) productRecView.getAdapter();
+            for (int i=0;i<complicatedProductAdapter.getItemCount();i++){
+                Log.e("adapter_removeSize", String.valueOf(productRecView.getAdapter().getItemCount()));
+                if (!DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS)))
                 {
-                    DataBaseHelper.getInstance(this).insertIntoComplicated(productName, adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),adapter.getProductMaterials().get(i).getStringExtra(FATS),
-                            adapter.getProductMaterials().get(i).getStringExtra(PROTEINS), adapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
-                            adapter.getProductMaterials().get(i).getStringExtra(FA), adapter.getProductMaterials().get(i).getStringExtra(KL),
-                    String.valueOf(adapter.getListGr().get(i)), "0");
-                    addComplicatedOntoHosting(this,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(adapter.getListFa().get(i)),
-                            String.valueOf(adapter.getListKl().get(i)), String.valueOf(adapter.getListProteins().get(i)), String.valueOf(adapter.getListCarb().get(i)), String.valueOf(adapter.getListFats().get(i)),String.valueOf(adapter.getListGr().get(i)));
+                    Log.e("adapter_removeSize", String.valueOf(productRecView.getAdapter().getItemCount()));
+                    DataBaseHelper.getInstance(this).insertIntoComplicated(productName, complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FATS),
+                            complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
+                            complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
+                    String.valueOf(complicatedProductAdapter.getListGr().get(i)), "0");
+                    addComplicatedOntoHosting(this,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListFa().get(i)),
+                            String.valueOf(complicatedProductAdapter.getListKl().get(i)), String.valueOf(complicatedProductAdapter.getListProteins().get(i)), String.valueOf(complicatedProductAdapter.getListCarb().get(i)), String.valueOf(complicatedProductAdapter.getListFats().get(i)),String.valueOf(complicatedProductAdapter.getListGr().get(i)));
                 }
 
-                else if(DataBaseHelper.getInstance(this).getCheckGrFromComplicated(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(adapter.getListGr().get(i)))){
-                    DataBaseHelper.getInstance(this).updateGrams(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(adapter.getListFats().get(i)),String.valueOf(adapter.getListProteins().get(i)),String.valueOf(adapter.getListCarb().get(i)),String.valueOf(adapter.getListFa().get(i)),String.valueOf(adapter.getListKl().get(i)),String.valueOf(adapter.getListGr().get(i)));
+                else if(DataBaseHelper.getInstance(this).getCheckGrFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListGr().get(i)))){
+                    Log.e("another","working");
+                    DataBaseHelper.getInstance(this).updateGrams(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListFats().get(i)),String.valueOf(complicatedProductAdapter.getListProteins().get(i)),String.valueOf(complicatedProductAdapter.getListCarb().get(i)),String.valueOf(complicatedProductAdapter.getListFa().get(i)),String.valueOf(complicatedProductAdapter.getListKl().get(i)),String.valueOf(complicatedProductAdapter.getListGr().get(i)));
                     updateGrIntoHosting(i);
                 }
+            }
+
+            for (int i=0;i<complicatedProductAdapter.getProductMaterials().size();i++){
+
+                Log.e("Helper", String.valueOf(DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS))));
+                Log.e("Helper2", String.valueOf((complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS))==null));
+                Log.e("Helper_adapter", String.valueOf(complicatedProductAdapter.getProductMaterials().size()));
+                if (DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS)) && (complicatedProductAdapter.getListFa().size()<complicatedProductAdapter.getProductMaterials().size())){
+                    Log.e("IF","удаление");
+                    for (int j=0;j<complicatedProductAdapter.getDeletedPositionsList().size();j++) {
+                        if (i==complicatedProductAdapter.getDeletedPositionsList().get(j)) {
+                            Log.e("IF","удаление2");
+
+                           // Log.d("data_gr",)
 
 
+
+                            //TODO удаление из таблицы составных и апдейт составного продукта в общем списке продуктов (локал и хост)
+                            DataBaseHelper.getInstance(this).changeLocalDBAfterDeletingInRecView(productName, complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FATS),
+                                    complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
+                                    complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
+                                    String.valueOf(complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(GR)));
+                            updateProductIntoHosting(i, complicatedProductAdapter);
+                            complicatedProductAdapter.removeFromMaterials(i);
+                            productRecView.setAdapter(complicatedProductAdapter);
+                        }
+                    }
+                }
             }
 
             DataBaseHelper.getInstance(this).insertIntoProduct(productName + "|",String.valueOf(fats),
@@ -368,11 +407,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
     private void updateGrIntoHosting(int i) {
-        Gson gson= new GsonBuilder().setLenient().create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MAIN_URL_CONST)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
         UpdateGrAPI updateGrAPI=retrofit.create(UpdateGrAPI.class);
         Call<String> call=updateGrAPI.updateGrApi(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(adapter.getListFats().get(i)),String.valueOf(adapter.getListProteins().get(i)),String.valueOf(adapter.getListCarb().get(i)),String.valueOf(adapter.getListFa().get(i)),String.valueOf(adapter.getListKl().get(i)),String.valueOf(adapter.getListGr().get(i)));
         call.enqueue(new Callback<String>() {
@@ -384,6 +418,37 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             public void onFailure(Call<String> call, Throwable t) {
             }
         });
+    }
+
+    private void updateProductIntoHosting(int i,ComplicatedProductAdapter complicatedProductAdapter) {
+        UpdateProductAPI updateProductAPI=retrofit.create(UpdateProductAPI.class);
+        Call<String> call=updateProductAPI.updateComplicated(productName, complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FATS),
+                complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
+                complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
+                String.valueOf(complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(GR)));
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()){
+                    Log.e("vseharasho","response");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+            }
+        });
+    }
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Log.e("home","tapped");
+                onBackPressed();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

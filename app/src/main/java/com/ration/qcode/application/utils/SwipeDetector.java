@@ -15,7 +15,7 @@ public class SwipeDetector implements View.OnTouchListener {
         RL, // Right to Left
         TB, // Top to bottom
         BT, // Bottom to Top
-        None // when no action was detecte
+        None // when no action was detected
     }
 
     private static final int MIN_DISTANCE = 100;

@@ -156,5 +156,4 @@ public class MainListFragment extends Fragment implements AdapterUpdatable {
         listMain.setAdapter(mainAdapter);
     }
 
-
 }
