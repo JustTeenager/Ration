@@ -29,6 +29,7 @@ public class ChooseProductDialog extends DialogFragment {
         this.date = date;
         this.menu = menu;
         this.intent = intent;
+        //
     }
 
     @Override
