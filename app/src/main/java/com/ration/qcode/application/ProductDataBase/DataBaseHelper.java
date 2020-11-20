@@ -8,11 +8,22 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.internet.DateMenuResponse;
+import com.ration.qcode.application.utils.internet.DeleteFromDateAPI;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 
 /**
  * @author zeza on 06.04.2017.
@@ -443,11 +454,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     + "(" + ID_MENU + ") = '" + menu + "'";
             dbW.execSQL(removeMenu);
             dbW.execSQL(removeMenuDates);
-            if (getMenues(date).isEmpty())
-            {
+            if (getMenues(date).isEmpty()) {
                 Log.e("MENU", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
+                removeDateFromHosting(date);
             }
         }
     }
@@ -464,6 +475,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 Log.e("MENU2", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
+                removeDateFromHosting(date);
             }
         }
         catch (Exception e) {}
@@ -519,6 +531,28 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         c.close();
         return all;
+    }
+
+    private void removeDateFromHosting(String date){
+        Gson gson=new GsonBuilder().setLenient().create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MAIN_URL_CONST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        DeleteFromDateAPI deleteFromDateAPI=retrofit.create(DeleteFromDateAPI.class);
+        Call<String> call=deleteFromDateAPI.removeDate(date);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful())
+                Log.d("Response",response.body());
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
     }
 
 

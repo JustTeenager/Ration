@@ -225,11 +225,46 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
                 public void afterTextChanged(Editable editable) {
                     if (editTextGr.getText().toString().isEmpty()) editTextGr.setText("0");
                     gr= Double.parseDouble(editTextGr.getText().toString());
-                    listGr.set(postition,gr);
-                    productMaterials.get(postition).putExtra(GR,editTextGr.getText().toString());
+                    if (gr>0) {
+                        calculate(gr / listGr.get(postition));
+                        listGr.set(postition, gr);
+                        productMaterials.get(postition).putExtra(GR, editTextGr.getText().toString());
+                    }
                 }
             });
             itemView.setOnLongClickListener(this);
+        }
+
+        private void calculate(double coeff) {
+
+
+                proteins100=getListProteins().get(postition);
+                fats100=getListFats().get(postition);
+                carb100=getListCarb().get(postition);
+                fa100=getListFa().get(postition);
+                kl100=getListKl().get(postition);
+
+                ///рез-т=предыдущие белки/предыдущие граммы * на новые граммы
+                Log.e("grams= ", String.valueOf(getListGr().get(postition)));
+                proteins = proteins100 *coeff;
+                getListProteins().set(postition,proteins);
+                fats = fats100 *coeff;
+                getListFats().set(postition,fats);
+                carb = carb100 *coeff;
+                getListCarb().set(postition,carb);
+                fa = fa100 *coeff;
+                getListFa().set(postition,fa);
+                kl = kl100 *coeff;
+                getListKl().set(postition,kl);
+
+
+            textViewProteins.setText(decimalFormat.format(proteins));
+            textViewFats.setText(decimalFormat.format(fats));
+            textViewCarbohydrates.setText(decimalFormat.format(carb));
+            textViewFA.setText(decimalFormat.format(fa));
+            textViewKl.setText(decimalFormat.format(kl));
+           // editTextGr.setText(decimalFormat.format(gr));
+
         }
 
         public void bind(Intent intent, int position) {

@@ -200,6 +200,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
     private void calculation(){
+
         if (productRecView.getAdapter().getItemCount()>0) {
             gr100=0;
             proteins100=0;
@@ -222,11 +223,12 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 fa100=adapter.getListFa().get(i);
                 kl100=adapter.getListKl().get(i);
 
-                proteins += proteins100 / 100 * grams;
-                fats += fats100 / 100 * grams;
-                carb += carb100 / 100 * grams;
-                fa += fa100 / 100 * grams;
-                kl += kl100 / 100 * grams;
+                Log.e("grams= ", String.valueOf(adapter.getListGr().get(i)));
+                proteins += proteins100 / adapter.getListGr().get(i) * grams;
+                fats += fats100 / adapter.getListGr().get(i) * grams;
+                carb += carb100 / adapter.getListGr().get(i) * grams;
+                fa += fa100 / adapter.getListGr().get(i) * grams;
+                kl += kl100 / adapter.getListGr().get(i) * grams;
                 gr += grams;
 
 
@@ -433,7 +435,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     Log.e("vseharasho","response");
                 }
             }
-
             @Override
             public void onFailure(Call<String> call, Throwable t) {
             }
