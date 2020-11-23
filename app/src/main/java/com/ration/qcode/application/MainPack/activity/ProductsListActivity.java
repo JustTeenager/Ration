@@ -149,6 +149,7 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         intent.putExtra(FA, fas.get(i));
         intent.putExtra(KL, kl.get(i));
         intent.putExtra(GR, gr.get(i));
+        intent.putExtra(SearchComplicatedProductActivity.NAME,getIntent().getStringExtra(SearchComplicatedProductActivity.NAME));
         Log.d("tut_intent_value", String.valueOf(getIntent().getIntExtra(ID_PRODUCT,-1)));
         intent.putExtra(ID_PRODUCT,getIntent().getIntExtra(ID_PRODUCT,-1));
         intent.putExtra(COMPLICATED,isComplicated.get(i));

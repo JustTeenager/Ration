@@ -38,7 +38,10 @@ import com.ration.qcode.application.utils.internet.IGetAllMenuDateAPI;
 import com.ration.qcode.application.utils.internet.MenuResponse;
 import com.ration.qcode.application.utils.internet.TasksResponse;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -308,7 +311,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<List<ComplicatedResponse>> call, Throwable t) {
-
             }
         });
 
@@ -351,6 +353,9 @@ public class MainActivity extends AppCompatActivity
                        DateResponse list = response.body().get(i);
                        if (dataBaseHelper.getDates(list.getDate()).isEmpty()) {
                            dataBaseHelper.insertDate(list.getDate());
+                       }
+                       else{
+                         //  dataBaseHelper.insertDate(new SimpleDateFormat("dd.MM.yy").format(new Date()));
                        }
                    }
                    mUpdatable.updateAdapter();

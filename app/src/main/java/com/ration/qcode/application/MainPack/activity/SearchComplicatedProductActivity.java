@@ -65,6 +65,7 @@ import static com.ration.qcode.application.utils.Constants.YEAR;
 
 public class SearchComplicatedProductActivity extends AppCompatActivity {
     public static final String PROD_SEARCH_COMPL = "Complicated";
+    public static final String NAME = "name_to_deal_with_info";
     private EditText editTextSearch;
     private EditText productNameEditText;
     private ImageView searchProduct;
@@ -123,6 +124,11 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 searchProduct(view);
             }
         });
+
+        if (getIntent().getStringExtra(NAME)!=null) {
+            Log.d("NAME","workingInSearch");
+            productNameEditText.setText(getIntent().getStringExtra(NAME));
+        }
 
         productNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -204,6 +210,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             inten.putExtra(MENU, menu);
             inten.putExtra(DATE, date);
         }
+        inten.putExtra(NAME,productName);
         inten.putExtra(ID_PRODUCT,getIntent().getIntExtra(ID_PRODUCT,-1));
         inten.putExtra(PROD_SEARCH, editTextSearch.getText().toString());
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

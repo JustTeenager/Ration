@@ -141,6 +141,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
              String jiry, String belki,
              String uglevod, String fa, String kl, String gram,String complicated) {
 
+        Log.d("Tut","вошли в добавление");
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(ID_MENU, menu);
@@ -186,6 +187,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         dbR = this.getReadableDatabase();
         Cursor c = dbR.rawQuery(selectQuery, null);
         boolean bool= c.getCount() > 0;
+        c.close();
+        dbR.close();
+        return bool;
+    }
+
+    public boolean getCheckFromDate(String date){
+        String selectQuery = "SELECT * FROM "
+                + TABLE_DATE + " WHERE ("+DATE+") = '"+date+"'";
+        dbR = this.getReadableDatabase();
+        Cursor c = dbR.rawQuery(selectQuery, null);
+        boolean bool= c.getCount() == 0;
         c.close();
         dbR.close();
         return bool;

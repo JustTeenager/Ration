@@ -294,6 +294,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             //
             if (!products.isEmpty()) {
                 if (!db.getDates().contains(date)) {
+                    Log.e("data_tut "+date,"обычная дата");
                     db.insertDate(date);
                     insertInHostingIntoDate(date);
                 }
@@ -313,15 +314,26 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             ArrayList<String> menus = db.getMenues(dateNow);
             int size = menus.size();
             if (!products.isEmpty()) {
+                boolean isDateWrited=false;
                 if (size == 0) {
+                    Log.e("data_tut "+dateNow,"необычная дата");
                     db.insertDate(dateNow);
                     insertInHostingIntoDate(dateNow);
                     db.insertMenuDates(timeNow, dateNow);
                     insertInHostingIntoDateMenu(timeNow,dateNow);
+                    isDateWrited=true;
                 } else {
                     db.insertMenuDates(timeNow, dateNow);
                     insertInHostingIntoDateMenu(timeNow,dateNow);
                 }
+
+                if(db.getCheckFromDate(dateNow) && !isDateWrited){
+                    Log.e("data_tut ","ебанутая дата");
+                    db.insertDate(dateNow);
+                    insertInHostingIntoDate(dateNow);
+                    isDateWrited=false;
+                }
+
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(timeNow, dateNow, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
@@ -331,14 +343,13 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             }
         }
 
-        finish();
 
-        Intent i = getBaseContext().getPackageManager().
-                getLaunchIntentForPackage(getBaseContext().getPackageName());
+        Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         startActivity(i);
+        finish();
 
     }
 
@@ -366,11 +377,13 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
                     public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                    Log.e("data_tut","вошли в онРеспонс");
+                    if(response.isSuccessful())  Log.e("data_tut","онРеспонс успешен");
                     }
 
                     @Override
                     public void onFailure(Call<AddProductResponse> call, Throwable t) {
-
+                        Log.e("data_tut","пососали "+t);
                     }
                 });
     }
