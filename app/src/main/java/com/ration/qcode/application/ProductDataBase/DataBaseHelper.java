@@ -469,6 +469,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String removeMenu = "DELETE FROM " + TABLE_MENU + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
                     + "(" + ID_MENU + ") = '" + menu + "' AND "
                     + "(" + PRODUCT + ") = '" + product + "'";
+            Log.d("removeFromMenu_Tut","вошли в метод");
             dbW.execSQL(removeMenu);
             if (getMenues(date).isEmpty()) {
                 Log.e("MENU2", String.valueOf(getMenues(date)));
@@ -477,17 +478,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 removeDateFromHosting(date);
             }
         }
-        catch (Exception e) {}
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public void changeLocalDBAfterDeletingInRecView(String name,String product,
-                                                    String jiry, String belki,
-                                                    String uglevod, String fa, String kl, String gram) {
-        dbW = this.getWritableDatabase();
-
+    public void changeLocalDBAfterDeletingInRecView(String name,String product) {
+        dbW=this.getWritableDatabase();
         String removeCompl = "DELETE FROM " + TABLE_COMPLICATED + " WHERE (" + COMPLICATED_NAME + ") = '" + name + "' AND "
                 + "(" + PRODUCT + ") = '" + product + "'";
+        dbW.execSQL(removeCompl);
+    }
+
+    public void updateProductComplicated(String name,
+    String jiry, String belki,
+    String uglevod, String fa, String kl){
+
+        dbW = this.getWritableDatabase();
+
         String updateProduct = "UPDATE " + TABLE_ALLPRODUCTS + " SET " +
                 "("+ JIRY + ") ='"+jiry+
                 "', ("+ BELKI + ") ='"+belki+
@@ -495,7 +504,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 "', ("+ FA + ") ='"+fa+
                 "', ("+ KL + ") ='"+kl+"'"+
                 " WHERE (" + PRODUCT + ") = '" + name + "'";
-        dbW.execSQL(removeCompl);
+
         dbW.execSQL(updateProduct);
     }
 
@@ -560,6 +569,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             mInstance = new DataBaseHelper(ctx.getApplicationContext());
         }
         return mInstance;
+    }
+
+    public void removeComplicatedProduct(String productName) {
+            this.dbW=getWritableDatabase();
+            String query="DELETE FROM "+TABLE_COMPLICATED+" WHERE "+"("+COMPLICATED_NAME+")='"+productName+"'" ;
+            dbW.execSQL(query);
+    }
+
+    public void removeProduct(String productName) {
+        this.dbW=getWritableDatabase();
+        String query="DELETE FROM "+TABLE_ALLPRODUCTS+" WHERE "+"("+PRODUCT+")='"+productName+"'" ;
+        dbW.execSQL(query);
     }
 }
 

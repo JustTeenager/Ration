@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.dialog.AddProductDialog;
 import com.ration.qcode.application.MainPack.fragment.AnalyzesListFragment;
-import com.ration.qcode.application.MainPack.fragment.FeedbackFragment;
+
 import com.ration.qcode.application.MainPack.fragment.MainListFragment;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
@@ -35,14 +35,9 @@ import com.ration.qcode.application.utils.internet.IGetAllDataAPI;
 import com.ration.qcode.application.utils.internet.IGetAllDateAPI;
 import com.ration.qcode.application.utils.internet.IGetAllMenuAPI;
 import com.ration.qcode.application.utils.internet.IGetAllMenuDateAPI;
-import com.ration.qcode.application.utils.internet.IGetPrice;
 import com.ration.qcode.application.utils.internet.MenuResponse;
-import com.ration.qcode.application.utils.internet.PriceResponse;
 import com.ration.qcode.application.utils.internet.TasksResponse;
-import com.yandex.money.api.methods.payment.params.PaymentParams;
-import com.yandex.money.api.methods.payment.params.PhoneParams;
 
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
 
@@ -51,7 +46,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.yandex.money.android.PaymentActivity;
 
 import static com.ration.qcode.application.utils.Constants.DAY;
 import static com.ration.qcode.application.utils.Constants.HOUR;
@@ -173,42 +167,12 @@ public class MainActivity extends AppCompatActivity
             FragmentClass = MainListFragment.class;
         } else if (id == R.id.nav_analize) {
             FragmentClass = AnalyzesListFragment.class;
-        } else if (id == R.id.nav_support) {
-            FragmentClass = FeedbackFragment.class;
         } else if (id == R.id.nav_update) {
             //update();
             new Async().execute();
 
         } else if (id == R.id.nav_insert) {
             callDialogInsertProduct();
-        } else if (id == R.id.nav_bill) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(MAIN_URL_CONST)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            IGetPrice priceTasksApi = retrofit.create(IGetPrice.class);
-            Call<PriceResponse> call = priceTasksApi.getPrice();
-            call.enqueue(new Callback<PriceResponse>() {
-                @Override
-                public void onResponse(Call<PriceResponse> call, Response<PriceResponse> response) {
-                    if (response.isSuccessful()) {
-                        double price = response.body().getPrice();
-
-                        PaymentParams phoneParams = PhoneParams.newInstance(getString(R.string.account), new BigDecimal(price));
-                        Intent intent = PaymentActivity.getBuilder(MainActivity.this)
-                                .setPaymentParams(phoneParams)
-                                .setClientId(CLIENT_ID)
-                                .setHost(HOST)
-                                .build();
-                        startActivityForResult(intent, REQUEST_CODE);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<PriceResponse> call, Throwable t) {
-
-                }
-            });
         } else {
         }
 

@@ -3,7 +3,6 @@ package com.ration.qcode.application.MainPack.dialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,20 +12,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.ration.qcode.application.MainPack.validator.Validator;
+import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
-import com.ration.qcode.application.utils.internet.AddProductAPI;
-import com.ration.qcode.application.utils.internet.AddProductBody;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 
 /**
  * Created by deepdev on 10.04.17.
@@ -85,6 +79,9 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
                     if (validator.validetBelki(belok)) {
                         if (validator.validetUglevod(uglevod)) {
                             if (validator.validetJiry(jiry)) {
+
+                                //DataBaseHelper.getInstance(getActivity()).insertIntoProduct(name+"|",belok,jiry,uglevod,fa,kkal,"100","0");
+
                                 NetworkService.getInstance(Constants.MAIN_URL_CONST)
                                         .getJSONApi()
                                         .insertProduct(name, fa, kkal, belok, uglevod, jiry, String.valueOf(0))

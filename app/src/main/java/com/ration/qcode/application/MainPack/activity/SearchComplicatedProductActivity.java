@@ -29,6 +29,8 @@ import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
+import com.ration.qcode.application.utils.internet.IRemoveProductAPI;
+import com.ration.qcode.application.utils.internet.RemoveProductFromMenu;
 import com.ration.qcode.application.utils.internet.UpdateGrAPI;
 import com.ration.qcode.application.utils.internet.UpdateProductAPI;
 
@@ -42,6 +44,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
+import static com.ration.qcode.application.utils.Constants.COMPLICATED;
 import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.DAY;
 import static com.ration.qcode.application.utils.Constants.FA;
@@ -68,6 +71,8 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     private RecyclerView productRecView;
     private static ComplicatedProductAdapter adapter;
 
+    private EditText mProductGrEditText;
+
     private Retrofit retrofit;
 
     private TextView textBelLevel;
@@ -82,9 +87,14 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     private String menu, date;
 
     private Intent intent;
+
+
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("Create","complicatedSearch");
         setContentView(R.layout.activity_search_complicated_product);
 
         Gson gson= new GsonBuilder().setLenient().create();
@@ -94,6 +104,8 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 .build();
         editTextSearch= (EditText) findViewById(R.id.editSearch);
         productNameEditText= (EditText) findViewById(R.id.product_name);
+
+        mProductGrEditText=findViewById(R.id.editTotalGram);
         searchProduct= (ImageView) findViewById(R.id.search_image_view);
 
         textBelLevel= (TextView) findViewById(R.id.textBel);
@@ -142,10 +154,11 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         //Просто создание
         if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null && intent.getStringExtra("COMPL")==null) {
             if (adapter == null) {
-                adapter = new ComplicatedProductAdapter(this);
+                adapter = new ComplicatedProductAdapter(this,mProductGrEditText);
             }
-            adapter.addProduct(intent);
+            adapter.addProduct(intent,mProductGrEditText);
             productRecView.setAdapter(adapter);
+            productRecView.setItemAnimator(null);
         }
 
 
@@ -153,26 +166,29 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         //распаковка сложного продукта
         else if(intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null && intent.getStringExtra("COMPL")!=null) {
             if (adapter == null) {
-                adapter = new ComplicatedProductAdapter(this);
-
-
+                adapter = new ComplicatedProductAdapter(this,mProductGrEditText);
 
                 ArrayList<Intent> intentsList = DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
                 productNameEditText.setText(intent.getStringExtra(PRODUCTS));
                 for (Intent intent : intentsList) {
-                    adapter.addProduct(intent);
-                    productRecView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
+                    adapter.addProduct(intent,mProductGrEditText);
                 }
+                adapter.setEditText(mProductGrEditText);
+                productRecView.setAdapter(adapter);
+                productRecView.setItemAnimator(null);
+
             }
             else {
+                Log.e("setEditText","сетим");
+                adapter.setEditText(mProductGrEditText);
                 ArrayList<Intent> intentsList = DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
                 productNameEditText.setText(intent.getStringExtra(PRODUCTS));
                 for (Intent intent : intentsList) {
-                    adapter.addProduct(intent);
-                    productRecView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
+                    adapter.addProduct(intent,mProductGrEditText);
+
+                    //adapter.notifyDataSetChanged();
                 }
+                productRecView.setAdapter(adapter);
             }
         }
 
@@ -188,7 +204,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             inten.putExtra(MENU, menu);
             inten.putExtra(DATE, date);
         }
-
+        inten.putExtra(ID_PRODUCT,getIntent().getIntExtra(ID_PRODUCT,-1));
         inten.putExtra(PROD_SEARCH, editTextSearch.getText().toString());
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         inten.putExtra(PROD_SEARCH_COMPL,"YES");
@@ -275,10 +291,15 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 intentProduct.putExtra("From menu", "yes");
                 this.date = intent.getStringExtra(DATE);
                 this.menu = intent.getStringExtra(MENU);
+
                 intentProduct.putExtra(MENU, menu);
                 intentProduct.putExtra(DATE, date);
             }
+
+            Log.d("ВЫЗЫВАЕТСЯ ХУЙНЯ ", String.valueOf(intent.getIntExtra(ID_PRODUCT,228)));
+
             if (intent.getIntExtra(ID_PRODUCT, -1) != -1) {
+
                 int item = intent.getIntExtra(ID_PRODUCT, -1);
 
                 intentProduct.putExtra("from Add", "yes");
@@ -290,8 +311,10 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 ProductInfoActivity.kl.set(item, "" + kl);
                 ProductInfoActivity.gr.set(item, "" + gr);
                 ProductInfoActivity.isComplicated.set(item,"1");
-            } else {
+            }
+            else {
                 intentProduct.putExtra("from Add", "yes");
+                Log.d("ВЫЗЫВАЕТСЯ ХУЙНЯ ","ХУЙНЯ");
                 ProductInfoActivity.products.add(productName);
                 ProductInfoActivity.proteins.add("" + proteins);
                 ProductInfoActivity.fats.add("" + fats);
@@ -303,15 +326,21 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             }
 //
             ComplicatedProductAdapter complicatedProductAdapter= (ComplicatedProductAdapter) productRecView.getAdapter();
+
+
+            DataBaseHelper.getInstance(this).removeComplicatedProduct(productName);
+
+
+
             for (int i=0;i<complicatedProductAdapter.getItemCount();i++){
-                Log.e("adapter_removeSize", String.valueOf(productRecView.getAdapter().getItemCount()));
+
                 if (!DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS)))
                 {
                     Log.e("adapter_removeSize", String.valueOf(productRecView.getAdapter().getItemCount()));
                     DataBaseHelper.getInstance(this).insertIntoComplicated(productName, complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FATS),
                             complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
                             complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
-                    String.valueOf(complicatedProductAdapter.getListGr().get(i)), "0");
+                            String.valueOf(complicatedProductAdapter.getListGr().get(i)), "0");
                     addComplicatedOntoHosting(this,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListFa().get(i)),
                             String.valueOf(complicatedProductAdapter.getListKl().get(i)), String.valueOf(complicatedProductAdapter.getListProteins().get(i)), String.valueOf(complicatedProductAdapter.getListCarb().get(i)), String.valueOf(complicatedProductAdapter.getListFats().get(i)),String.valueOf(complicatedProductAdapter.getListGr().get(i)));
                 }
@@ -323,36 +352,15 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 }
             }
 
-            for (int i=0;i<complicatedProductAdapter.getProductMaterials().size();i++){
-
-                Log.e("Helper", String.valueOf(DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS))));
-                Log.e("Helper2", String.valueOf((complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS))==null));
-                Log.e("Helper_adapter", String.valueOf(complicatedProductAdapter.getProductMaterials().size()));
-                if (DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS)) && (complicatedProductAdapter.getListFa().size()<complicatedProductAdapter.getProductMaterials().size())){
-                    Log.e("IF","удаление");
-                    for (int j=0;j<complicatedProductAdapter.getDeletedPositionsList().size();j++) {
-                        if (i==complicatedProductAdapter.getDeletedPositionsList().get(j)) {
-                            Log.e("IF","удаление2");
-
-                           // Log.d("data_gr",)
-
-
-
-                            //TODO удаление из таблицы составных и апдейт составного продукта в общем списке продуктов (локал и хост)
-                            DataBaseHelper.getInstance(this).changeLocalDBAfterDeletingInRecView(productName, complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FATS),
-                                    complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
-                                    complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
-                                    String.valueOf(complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(GR)));
-                            updateProductIntoHosting(i, complicatedProductAdapter);
-                            complicatedProductAdapter.removeFromMaterials(i);
-                            productRecView.setAdapter(complicatedProductAdapter);
-                        }
-                    }
-                }
+            for (int i=0;i<complicatedProductAdapter.getDeletedStringsList().size();i++){
+            DataBaseHelper.getInstance(this).changeLocalDBAfterDeletingInRecView(productName, complicatedProductAdapter.getDeletedStringsList().get(i));
+               updateProductIntoHosting(i, complicatedProductAdapter);
             }
 
-            DataBaseHelper.getInstance(this).insertIntoProduct(productName + "|",String.valueOf(fats),
-                    String.valueOf(proteins),String.valueOf(carb),String.valueOf(fa),String.valueOf(kl),String.valueOf(gr),"1");
+
+            DataBaseHelper.getInstance(this).insertIntoProduct(productName + "|",String.valueOf(proteins),
+                    String.valueOf(fats),String.valueOf(carb),String.valueOf(fa),String.valueOf(kl),String.valueOf(gr),"1");
+
 
             addComplicatedProductOntoHosting(this,productName,String.valueOf(fa),
                     String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats));
@@ -361,7 +369,28 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             intentProduct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intentProduct);
         } else {
-            onBackPressed();
+            if (adapter.getProductMaterials().isEmpty()) {
+                try {
+                    Log.e("adapter_removeSize", String.valueOf(adapter.getProductMaterials().isEmpty()));
+                    Intent intent = getIntent();
+                    ProductInfoActivity.isComplicated.remove(intent.getStringExtra(COMPLICATED));
+                    ProductInfoActivity.carbohydrates.remove(intent.getStringExtra(CARBOHYDRATES));
+                    ProductInfoActivity.fas.remove(intent.getStringExtra(FA));
+                    ProductInfoActivity.fats.remove(intent.getStringExtra(FATS));
+                    ProductInfoActivity.gr.remove(intent.getStringExtra(GR));
+                    ProductInfoActivity.kl.remove(intent.getStringExtra(KL));
+                    ProductInfoActivity.proteins.remove(intent.getStringExtra(PROTEINS));
+                    ProductInfoActivity.products.remove(intent.getStringExtra(PRODUCTS));
+                    DataBaseHelper.getInstance(this).removeFromMenu(date, menu, productName + "|");
+                    removeFromHostingMenu(date, menu, productName + "|");
+                    DataBaseHelper.getInstance(this).removeComplicatedProduct(productName);
+                    Log.e("adapter_removeSize", "зашли в удаление");
+                    DataBaseHelper.getInstance(this).removeProduct(productName);
+                    removeComplicatedProductFromHosting(productName);
+                }catch (Exception e){}
+                //adapter=null;
+                onBackPressed();
+            }
         }
         adapter=null;
     }
@@ -375,10 +404,14 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         new Callback<AddProductResponse>() {
                             @Override
                             public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
+                                if (response.isSuccessful())
+                                Log.d("INSERT_COMPL_IN_OST", String.valueOf(response.body()));
                             }
 
                             @Override
-                            public void onFailure(Call<AddProductResponse> call, Throwable t) {}
+                            public void onFailure(Call<AddProductResponse> call, Throwable t) {
+                                Log.e("INSERT_COMPL_IN_OST", String.valueOf(t));
+                            }
                         });
     }
 
@@ -398,9 +431,31 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         });
     }
 
+    private void removeComplicatedProductFromHosting (String productName){
+        IRemoveProductAPI removeProductAPI=retrofit.create(IRemoveProductAPI.class);
+        Call<String> call=removeProductAPI.removeProduct(productName);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.e("Tut_removeComplFromH","onResponse");
+                if (response.isSuccessful()){ Log.e("Tut_removeComplFromH","удачный onResponse");}
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+
+    }
+
     private void updateGrIntoHosting(int i) {
         UpdateGrAPI updateGrAPI=retrofit.create(UpdateGrAPI.class);
-        Call<String> call=updateGrAPI.updateGrApi(productName,adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(adapter.getListFats().get(i)),String.valueOf(adapter.getListProteins().get(i)),String.valueOf(adapter.getListCarb().get(i)),String.valueOf(adapter.getListFa().get(i)),String.valueOf(adapter.getListKl().get(i)),String.valueOf(adapter.getListGr().get(i)));
+        Call<String> call=updateGrAPI.updateGrApi(productName,
+                adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS), String.valueOf(adapter.getListFats().get(i)),
+                String.valueOf(adapter.getListProteins().get(i)),String.valueOf(adapter.getListCarb().get(i)),String.valueOf(adapter.getListFa().get(i)),
+                String.valueOf(adapter.getListKl().get(i)),String.valueOf(adapter.getListGr().get(i)));
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -414,10 +469,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
     private void updateProductIntoHosting(int i,ComplicatedProductAdapter complicatedProductAdapter) {
         UpdateProductAPI updateProductAPI=retrofit.create(UpdateProductAPI.class);
-        Call<String> call=updateProductAPI.updateComplicated(productName, complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FATS),
-                complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
-                complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
-                String.valueOf(complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(GR)));
+        Call<String> call=updateProductAPI.updateComplicated(productName, complicatedProductAdapter.getDeletedStringsList().get(i));
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -425,6 +477,23 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     Log.e("vseharasho","response");
                 }
             }
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+            }
+        });
+    }
+
+    private void removeFromHostingMenu(String date,String menu,String product) {
+
+        RemoveProductFromMenu removeProductFromMenu=retrofit.create(RemoveProductFromMenu.class);
+        Call<String> call=removeProductFromMenu.removeProductFromMenu(menu,date,product);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                }
+            }
+
             @Override
             public void onFailure(Call<String> call, Throwable t) {
             }

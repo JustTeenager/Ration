@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
-import com.ration.qcode.application.MainPack.dialog.ChooseProductDialog;
+
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.Constants;
@@ -170,14 +170,38 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fabCompl = (FloatingActionButton) findViewById(R.id.fab_complicated);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChooseProductDialog dialog = new ChooseProductDialog(date,menu,intent);
-                dialog.show(getFragmentManager(),null);
-                setAdapter();
+                Intent inten = new Intent(ProductInfoActivity.this, AddProductActivity.class);
+                addProducts(inten);
             }
         });
+        fabCompl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent inten = new Intent(ProductInfoActivity.this, SearchComplicatedProductActivity.class);
+                addProducts(inten);
+            }
+        });
+    }
+
+    private void addProducts(Intent inten) {
+        if (intent.getStringExtra("From menu") != null) {
+            inten.putExtra("From menu", "yes");
+            inten.putExtra(MENU, menu);
+            inten.putExtra(DATE, date);
+        }
+        inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(inten);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -191,7 +215,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
                 startActivity(i);
                 break;
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -205,7 +228,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void replaceFromHostingMenu(String date, String menu, String product, String s, String s1, String s2, String s3, String s4, String s5, String s6){
-        //TODO: написать скрипт и интерфейс
+        Log.e("REPLACE_Tut","вошли в метод");
         ReplaceMenuAPI replaceMenuAPI=mRetrofit.create(ReplaceMenuAPI.class);
         Call<String> call=replaceMenuAPI.insertProduct(menu,date,product,s,s1,s2,s3,s4,s5,s6);
         call.enqueue(new Callback<String>() {
@@ -218,7 +241,11 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                try {
+                    throw t;
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
             }
         });
     }
@@ -277,6 +304,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                   /*  insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i),isComplicated.get(i));*/
+                    Log.d("Tut_i_v_fore ", String.valueOf(i));
                     replaceFromHostingMenu(date,menu,products.get(i) + "|",fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                 }
@@ -372,9 +400,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         } else {
 
             Intent inten;
-            Log.e("Tut_FA",fas.get(i));
-            Log.e("Tut_i", String.valueOf(i));
-            Log.e("Tut_nullComplicated", String.valueOf(isComplicated.get(i)==null));
             if (isComplicated.get(i).equals("1")){
                 inten=new Intent(this,SearchComplicatedProductActivity.class);
                 inten.putExtra("COMPL","true");
@@ -388,6 +413,8 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 inten.putExtra(MENU, menu);
                 inten.putExtra(DATE, date);
             }
+
+            //////////////////////////////////////////////////////////////////////////////
             inten.putExtra(ID_PRODUCT, i);
             inten.putExtra(PRODUCTS, products.get(i));
             inten.putExtra(PROTEINS, proteins.get(i));

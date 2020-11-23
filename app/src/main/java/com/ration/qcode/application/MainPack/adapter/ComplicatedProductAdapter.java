@@ -2,6 +2,7 @@ package com.ration.qcode.application.MainPack.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,9 +27,31 @@ import static com.ration.qcode.application.utils.Constants.PROTEINS;
 public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedProductAdapter.ProductHolder> {
 
     private Context mContext;
+    private EditText mTotalGrEditText;
+    private TextWatcher watcher;
+    private int selected_position = -1;
+
+    public ComplicatedProductAdapter(Context context, EditText editText) {
+        this.mContext = context;
+        this.mTotalGrEditText = editText;
+        productMaterials = new ArrayList<>();
+        listCarb = new ArrayList<>();
+        listFats = new ArrayList<>();
+        listProteins = new ArrayList<>();
+        listFa = new ArrayList<>();
+        listKl = new ArrayList<>();
+        listGr = new ArrayList<>();
+        deletedStringsList = new ArrayList<>();
+    }
+
 
     public ArrayList<Intent> getProductMaterials() {
         return productMaterials;
+    }
+
+
+    public void setEditText(EditText text) {
+        this.mTotalGrEditText = text;
     }
 
     private ArrayList<Intent> productMaterials;
@@ -38,15 +61,17 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
     private ArrayList<Double> listFa;
     private ArrayList<Double> listKl;
     private ArrayList<Double> listGr;
-    private ArrayList<Integer> deletedPositionsList;
+    private ArrayList<String> deletedStringsList;
 
-    public ArrayList<Integer> getDeletedPositionsList() {
-        return deletedPositionsList;
+
+    public ArrayList<String> getDeletedStringsList() {
+        return deletedStringsList;
     }
 
     public ArrayList<Double> getListProteins() {
         return listProteins;
     }
+
     public ArrayList<Double> getListFats() {
         return listFats;
     }
@@ -69,22 +94,10 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
 
     @Override
     public ProductHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ProductHolder(LayoutInflater.from(mContext).inflate(R.layout.complicated_product_item,null));
+        return new ProductHolder(LayoutInflater.from(mContext).inflate(R.layout.complicated_product_item, null));
     }
 
-    public ComplicatedProductAdapter(Context context){
-        this.mContext=context;
-        productMaterials=new ArrayList<>();
-        listCarb=new ArrayList<>();
-        listFats=new ArrayList<>();
-        listProteins=new ArrayList<>();
-        listFa=new ArrayList<>();
-        listKl =new ArrayList<>();
-        listGr=new ArrayList<>();
-        deletedPositionsList=new ArrayList<>();
-    }
-
-    public void addProduct(Intent intent){
+    public void addProduct(Intent intent, EditText edit) {
         productMaterials.add(intent);
         listProteins.add(Double.parseDouble(intent.getStringExtra(PROTEINS)));
         listFats.add(Double.parseDouble(intent.getStringExtra(FATS)));
@@ -92,29 +105,28 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
         listFa.add(Double.parseDouble(intent.getStringExtra(FA)));
         listKl.add(Double.parseDouble(intent.getStringExtra(KL)));
         listGr.add(Double.parseDouble(intent.getStringExtra(GR)));
+        mTotalGrEditText = edit;
     }
 
-    public void removeProduct(int position){
-        //productMaterials.remove(position);
+    public void removeProduct(int position) {
+        deletedStringsList.add(productMaterials.get(position).getStringExtra(PRODUCTS));
+        productMaterials.remove(position);
+        Log.e("pos", String.valueOf(position));
+        Log.e("pr_size", String.valueOf(productMaterials.size()));
         listProteins.remove(position);
         listFats.remove(position);
         listCarb.remove(position);
         listFa.remove(position);
         listKl.remove(position);
         listGr.remove(position);
-        deletedPositionsList.add(position);
-        //notifyDataSetChanged();
-        notifyItemRemoved(position);
-    }
-
-    public void removeFromMaterials(int position){
-        productMaterials.remove(position);
-        notifyItemRemoved(position);
+        notifyDataSetChanged();
+        //notifyItemRemoved(position);
     }
 
     @Override
     public void onBindViewHolder(ProductHolder holder, int position) {
-        holder.bind(productMaterials.get(position),position);
+        holder.bind(productMaterials.get(position), position);
+        holder.itemView.setBackgroundColor(selected_position == position ? Color.GREEN : Color.TRANSPARENT);
     }
 
     @Override
@@ -123,11 +135,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
     }
 
 
-
-
-
-
-    public class ProductHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
+    public class ProductHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
 
         public double getProteins() {
             return proteins;
@@ -180,20 +188,25 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
         public double getCarb100() {
             return carb100;
         }
+
         public double getFa100() {
             return fa100;
         }
+
         public double getKl100() {
             return kl100;
         }
+
         public double getGr100() {
             return gr100;
         }
 
+
         private TextView textViewProducts, textViewProteins, textViewFats, textViewCarbohydrates,
                 textViewFA, textViewKl;
 
-        private EditText editTextGr;
+        private TextView mTextViewGr;
+        //private EditText mEditTextGr;
 
         private int postition;
 
@@ -204,80 +217,126 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
 
         public ProductHolder(View itemView) {
             super(itemView);
-            decimalFormat=new DecimalFormat("#.##");
+            decimalFormat = new DecimalFormat("#.##");
             textViewProducts = (TextView) itemView.findViewById(R.id.textViewProduct);
             textViewProteins = (TextView) itemView.findViewById(R.id.textViewProteins);
             textViewFats = (TextView) itemView.findViewById(R.id.textViewFats);
             textViewCarbohydrates = (TextView) itemView.findViewById(R.id.textViewCarbohydrates);
             textViewFA = (TextView) itemView.findViewById(R.id.textViewFA);
             textViewKl = (TextView) itemView.findViewById(R.id.textViewKg);
-            editTextGr = (EditText) itemView.findViewById(R.id.edit_text_gr);
-            editTextGr.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
+            mTextViewGr = (TextView) itemView.findViewById(R.id.edit_text_gr);
 
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
 
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (editTextGr.getText().toString().isEmpty()) editTextGr.setText("0");
-                    gr= Double.parseDouble(editTextGr.getText().toString());
-                    if (gr>0) {
-                        calculate(gr / listGr.get(postition));
-                        listGr.set(postition, gr);
-                        productMaterials.get(postition).putExtra(GR, editTextGr.getText().toString());
-                    }
-                }
-            });
+            //itemView.setOnFocusChangeListener(this);
+            itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
 
+
+
+        @Override
+        public boolean onLongClick(View v) {
+            removeProduct(postition);
+            return true;
+        }
+
+
+
+        @Override
+        public void onClick(View v) {
+
+            try{
+                mTotalGrEditText.removeTextChangedListener(watcher);
+            }
+            catch (Exception e){e.printStackTrace();}
+
+            notifyItemChanged(selected_position);
+            selected_position = getAdapterPosition();
+            mTotalGrEditText.setText("");
+            notifyItemChanged(selected_position);
+
+            watcher=new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    Log.e("TEXT","changing");
+                    if (!s.toString().isEmpty()) {
+                        if (mTotalGrEditText.getText().toString().isEmpty())
+                            mTextViewGr.setText("0");
+                        gr = Double.parseDouble(mTotalGrEditText.getText().toString());
+                        if (gr > 0) {
+                            Log.e("TEXT","calcs "+gr/listGr.get(postition));
+                            calculate(gr / listGr.get(postition));
+                            listGr.set(postition, gr);
+                            productMaterials.get(postition).putExtra(GR, mTotalGrEditText.getText().toString());
+                        }
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            };
+
+            //mTotalGrEditText.setText(String.valueOf(gr));
+            Log.e("total_text",mTotalGrEditText.getText().toString());
+            mTotalGrEditText.addTextChangedListener(watcher);
+            //mEditTextGr=
+        }
+
+
         private void calculate(double coeff) {
+            proteins100 = getListProteins().get(postition);
+            fats100 = getListFats().get(postition);
+            carb100 = getListCarb().get(postition);
+            fa100 = getListFa().get(postition);
+            kl100 = getListKl().get(postition);
 
+            ///рез-т=предыдущие белки/предыдущие граммы * на новые граммы
+            Log.e("grams= ", String.valueOf(getListGr().get(postition)));
+            proteins = proteins100 * coeff;
+            getListProteins().set(postition, proteins);
+            fats = fats100 * coeff;
+            getListFats().set(postition, fats);
+            carb = carb100 * coeff;
+            getListCarb().set(postition, carb);
+            fa = fa100 * coeff;
+            getListFa().set(postition, fa);
+            kl = kl100 * coeff;
+            getListKl().set(postition, kl);
 
-                proteins100=getListProteins().get(postition);
-                fats100=getListFats().get(postition);
-                carb100=getListCarb().get(postition);
-                fa100=getListFa().get(postition);
-                kl100=getListKl().get(postition);
+            Log.e("proteins= ", String.valueOf(getListProteins().get(postition)));
 
-                ///рез-т=предыдущие белки/предыдущие граммы * на новые граммы
-                Log.e("grams= ", String.valueOf(getListGr().get(postition)));
-                proteins = proteins100 *coeff;
-                getListProteins().set(postition,proteins);
-                fats = fats100 *coeff;
-                getListFats().set(postition,fats);
-                carb = carb100 *coeff;
-                getListCarb().set(postition,carb);
-                fa = fa100 *coeff;
-                getListFa().set(postition,fa);
-                kl = kl100 *coeff;
-                getListKl().set(postition,kl);
+            Log.e("fats= ", String.valueOf(getListFats().get(postition)));
+            Log.e("carb= ", String.valueOf(getListCarb().get(postition)));
 
 
             textViewProteins.setText(decimalFormat.format(proteins));
+            Log.e("proteins2= ", textViewProteins.getText().toString());
             textViewFats.setText(decimalFormat.format(fats));
             textViewCarbohydrates.setText(decimalFormat.format(carb));
             textViewFA.setText(decimalFormat.format(fa));
             textViewKl.setText(decimalFormat.format(kl));
-           // editTextGr.setText(decimalFormat.format(gr));
+            mTextViewGr.setText(decimalFormat.format(gr));
+            // editTextGr.setText(decimalFormat.format(gr));
 
         }
 
         public void bind(Intent intent, int position) {
-            this.postition=position;
+            this.postition = position;
 
             if (intent != null && intent.getStringExtra(PRODUCTS) != null && intent.getStringExtra(INFO) == null) {
-
-                proteins = Double.parseDouble(intent.getStringExtra(PROTEINS));
-                fats = Double.parseDouble(intent.getStringExtra(FATS));
-                carb = Double.parseDouble(intent.getStringExtra(CARBOHYDRATES));
-                fa = Double.parseDouble(intent.getStringExtra(FA));
-                kl = Double.parseDouble(intent.getStringExtra(KL));
-                gr = Double.parseDouble(intent.getStringExtra(GR));
+                proteins = Double.parseDouble(String.valueOf(listProteins.get(position)));
+                fats = Double.parseDouble(String.valueOf(listFats.get(position)));
+                carb = Double.parseDouble(String.valueOf(listCarb.get(position)));
+                fa = Double.parseDouble(String.valueOf(listFa.get(position)));
+                kl = Double.parseDouble(String.valueOf(listKl.get(position)));
+                gr = Double.parseDouble(String.valueOf(listGr.get(position)));
 
                 proteins100 = proteins;
                 fats100 = fats;
@@ -292,14 +351,9 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
                 textViewCarbohydrates.setText(decimalFormat.format(carb));
                 textViewFA.setText(decimalFormat.format(fa));
                 textViewKl.setText(decimalFormat.format(kl));
-                editTextGr.setText(decimalFormat.format(gr));
+                mTextViewGr.setText(decimalFormat.format(gr));
+                //mTotalGrEditText.setText(decimalFormat.format(gr));
             }
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            removeProduct(postition);
-            return true;
         }
     }
 }

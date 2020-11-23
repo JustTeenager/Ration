@@ -26,6 +26,7 @@ import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.FA;
 import static com.ration.qcode.application.utils.Constants.FATS;
 import static com.ration.qcode.application.utils.Constants.GR;
+import static com.ration.qcode.application.utils.Constants.ID_PRODUCT;
 import static com.ration.qcode.application.utils.Constants.KL;
 import static com.ration.qcode.application.utils.Constants.MENU;
 import static com.ration.qcode.application.utils.Constants.PRODUCTS;
@@ -148,7 +149,11 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         intent.putExtra(FA, fas.get(i));
         intent.putExtra(KL, kl.get(i));
         intent.putExtra(GR, gr.get(i));
+        Log.d("tut_intent_value", String.valueOf(getIntent().getIntExtra(ID_PRODUCT,-1)));
+        intent.putExtra(ID_PRODUCT,getIntent().getIntExtra(ID_PRODUCT,-1));
         intent.putExtra(COMPLICATED,isComplicated.get(i));
+
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

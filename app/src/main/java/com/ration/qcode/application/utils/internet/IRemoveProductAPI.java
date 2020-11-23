@@ -1,12 +1,14 @@
 package com.ration.qcode.application.utils.internet;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
-public interface UpdateProductAPI {
+public interface IRemoveProductAPI {
     @FormUrlEncoded
-    @POST("/removeProductFromCompl.php")
-    Call<String> updateComplicated(@Field("Name") String name, @Field("product") String product);
+    @POST("/removeProduct.php")
+    Call<String> removeProduct(@Field("Name") String name);
 }

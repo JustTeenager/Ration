@@ -19,14 +19,6 @@
             android:title="@string/analysis" />
     </group>
     <group
-        android:id="@+id/support"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_support"
-            android:icon="@drawable/ic_analize"
-            android:title="@string/feedback" />
-    </group>
-    <group
         android:id="@+id/update"
         android:checkableBehavior="single">
         <item
@@ -41,13 +33,5 @@
             android:id="@+id/nav_insert"
             android:icon="@drawable/ic_nav_insert"
             android:title="@string/insert" />
-    </group>
-    <group
-        android:id="@+id/bill"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_bill"
-            android:icon="@drawable/ic_bills"
-            android:title="@string/payment" />
     </group>
 </menu>
