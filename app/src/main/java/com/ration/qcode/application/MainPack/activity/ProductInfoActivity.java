@@ -25,6 +25,7 @@ import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
 import com.ration.qcode.application.utils.SwipeDetector;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
+import com.ration.qcode.application.utils.internet.DeleteFromDateAPI;
 import com.ration.qcode.application.utils.internet.RemoveFromMenu;
 import com.ration.qcode.application.utils.internet.RemoveProductFromMenu;
 import com.ration.qcode.application.utils.internet.ReplaceMenuAPI;
@@ -292,11 +293,12 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
             db.removeFromMenu(date, menu);
             //
+            Log.e("data_tut "+date,"обычная дата");
+            insertInHostingIntoDate(date);
             if (!products.isEmpty()) {
                 if (!db.getDates().contains(date)) {
-                    Log.e("data_tut "+date,"обычная дата");
                     db.insertDate(date);
-                    insertInHostingIntoDate(date);
+                    //insertInHostingIntoDate(date);
                 }
 
                 db.insertMenuDates(menu, date);
@@ -313,26 +315,27 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         } else {
             ArrayList<String> menus = db.getMenues(dateNow);
             int size = menus.size();
+            insertInHostingIntoDate(dateNow);
             if (!products.isEmpty()) {
-                boolean isDateWrited=false;
+               // boolean isDateWrited=false;
                 if (size == 0) {
                     Log.e("data_tut "+dateNow,"необычная дата");
                     db.insertDate(dateNow);
-                    insertInHostingIntoDate(dateNow);
+                    //insertInHostingIntoDate(dateNow);
                     db.insertMenuDates(timeNow, dateNow);
                     insertInHostingIntoDateMenu(timeNow,dateNow);
-                    isDateWrited=true;
+                    //isDateWrited=true;
                 } else {
                     db.insertMenuDates(timeNow, dateNow);
                     insertInHostingIntoDateMenu(timeNow,dateNow);
                 }
 
-                if(db.getCheckFromDate(dateNow) && !isDateWrited){
+               /* if(db.getCheckFromDate(dateNow) && !isDateWrited){
                     Log.e("data_tut ","ебанутая дата");
                     db.insertDate(dateNow);
                     insertInHostingIntoDate(dateNow);
                     isDateWrited=false;
-                }
+                }*/
 
                 for (int i = 0; i < products.size(); i++) {
                     db.insertIntoMenu(timeNow, dateNow, products.get(i) + "|", fats.get(i), proteins.get(i),
@@ -449,10 +452,10 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        db.removeFromMenu(date, menu, products.get(position) + "|");
+                        db.deleteFromMenu(date, menu, products.get(position) + "|");
                         removeFromHostingMenu(date,menu,products.get(position)+"|");
                         if (db.getProducts(date, menu).isEmpty()) {
-                            db.removeFromMenu(date, menu);
+                            db.deleteFromMenu(date, menu);
                             removeFromHostingMenu(date,menu);
                         }
 
@@ -479,6 +482,29 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         AlertDialog alert = builder.create();
         alert.show();
     }
+
+    private void removeDateFromHosting(String date){
+        Gson gson=new GsonBuilder().setLenient().create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MAIN_URL_CONST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        DeleteFromDateAPI deleteFromDateAPI=retrofit.create(DeleteFromDateAPI.class);
+        Call<String> call=deleteFromDateAPI.removeDate(date);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful())
+                    Log.d("Response",response.body());
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     public void clearAll() {
         isComplicated.clear();

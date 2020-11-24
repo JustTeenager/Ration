@@ -15,6 +15,6 @@ public interface AddProductAPI {
     @POST("/insertproduct.php")
     Call<AddProductResponse> insertProduct (@Field("name") String name, @Field("FA") String FA,
                                             @Field("KKAL") String KKAL, @Field("Belok") String Belok,
-                                            @Field("Uglevod") String Uglevod, @Field("Jiry") String Jiry,@Field("complicated")  String complicated);
+                                            @Field("Uglevod") String Uglevod, @Field("Jiry") String Jiry, @Field("Gram") String gram, @Field("complicated")  String complicated);
 
 }

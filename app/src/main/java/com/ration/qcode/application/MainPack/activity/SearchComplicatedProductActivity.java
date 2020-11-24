@@ -125,11 +125,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             }
         });
 
-        if (getIntent().getStringExtra(NAME)!=null) {
-            Log.d("NAME","workingInSearch");
-            productNameEditText.setText(getIntent().getStringExtra(NAME));
-        }
-
         productNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -197,7 +192,15 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 productRecView.setAdapter(adapter);
             }
         }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getIntent().getStringExtra(NAME)!=null) {
+            Log.d("INTENTIK","workingInSearch");
+            productNameEditText.setText(getIntent().getStringExtra(NAME));
+        }
     }
 
     public void searchProduct(View view) {
@@ -211,6 +214,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             inten.putExtra(DATE, date);
         }
         inten.putExtra(NAME,productName);
+        Log.e("INTENTIK", String.valueOf(getIntent().getStringExtra(NAME)));
         inten.putExtra(ID_PRODUCT,getIntent().getIntExtra(ID_PRODUCT,-1));
         inten.putExtra(PROD_SEARCH, editTextSearch.getText().toString());
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -370,7 +374,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
 
             addComplicatedProductOntoHosting(this,productName,String.valueOf(fa),
-                    String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats));
+                    String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats),String.valueOf(gr));
 
 
             intentProduct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -391,8 +395,8 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     DataBaseHelper.getInstance(this).removeFromMenu(date, menu, productName + "|");
                     removeFromHostingMenu(date, menu, productName + "|");
                     DataBaseHelper.getInstance(this).removeComplicatedProduct(productName);
-                    Log.e("adapter_removeSize", "зашли в удаление");
-                    DataBaseHelper.getInstance(this).removeProduct(productName);
+                    Log.e("adapter_removeSize", productName);
+                    DataBaseHelper.getInstance(this).removeProduct(productName+"|");
                     removeComplicatedProductFromHosting(productName);
                 }catch (Exception e){}
                 //adapter=null;
@@ -403,10 +407,10 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
 
-    private void addComplicatedProductOntoHosting(Context context, String name, String fa, String kkal, String belok, String uglevod, String jiry){
+    private void addComplicatedProductOntoHosting(Context context, String name, String fa, String kkal, String belok, String uglevod, String jiry,String gram){
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
                 .getJSONApi()
-                .insertProduct(name, fa, kkal, belok, uglevod, jiry, "1")
+                .insertProduct(name, fa, kkal, belok, uglevod, jiry,gram, "1")
                 .enqueue(
                         new Callback<AddProductResponse>() {
                             @Override

@@ -469,13 +469,76 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 Log.e("MENU", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
+                //removeDateFromHosting(date);
+            }
+        }
+    }
+
+    public void deleteFromMenu(String date, String menu) {
+        dbW = this.getWritableDatabase();
+        if (date == null || menu == null) {
+
+        } else {
+            String removeMenu = "DELETE FROM " + TABLE_MENU + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
+                    + "(" + ID_MENU + ") = '" + menu + "'";
+            String removeMenuDates = "DELETE FROM " + TABLE_MENUES_DATES + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
+                    + "(" + ID_MENU + ") = '" + menu + "'";
+            dbW.execSQL(removeMenu);
+            dbW.execSQL(removeMenuDates);
+            if (getMenues(date).isEmpty()) {
+                Log.e("MENU", String.valueOf(getMenues(date)));
+                String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
+                dbW.execSQL(removeDate);
                 removeDateFromHosting(date);
             }
         }
     }
 
+    private void removeDateFromHosting(String date){
+        Gson gson=new GsonBuilder().setLenient().create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(MAIN_URL_CONST)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        DeleteFromDateAPI deleteFromDateAPI=retrofit.create(DeleteFromDateAPI.class);
+        Call<String> call=deleteFromDateAPI.removeDate(date);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful())
+                    Log.d("Response",response.body());
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     public void removeFromMenu(String date, String menu, String product) {
+        dbW = this.getWritableDatabase();
+        try {
+            String removeMenu = "DELETE FROM " + TABLE_MENU + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
+                    + "(" + ID_MENU + ") = '" + menu + "' AND "
+                    + "(" + PRODUCT + ") = '" + product + "'";
+            Log.d("removeFromMenu_Tut","вошли в метод");
+            dbW.execSQL(removeMenu);
+            if (getMenues(date).isEmpty()) {
+                Log.e("MENU2", String.valueOf(getMenues(date)));
+                String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
+                dbW.execSQL(removeDate);
+                //removeDateFromHosting(date);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void deleteFromMenu(String date, String menu, String product) {
         dbW = this.getWritableDatabase();
         try {
             String removeMenu = "DELETE FROM " + TABLE_MENU + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
@@ -553,27 +616,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return all;
     }
 
-    private void removeDateFromHosting(String date){
-        Gson gson=new GsonBuilder().setLenient().create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MAIN_URL_CONST)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        DeleteFromDateAPI deleteFromDateAPI=retrofit.create(DeleteFromDateAPI.class);
-        Call<String> call=deleteFromDateAPI.removeDate(date);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful())
-                Log.d("Response",response.body());
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
-            }
-        });
-    }
 
 
     public static synchronized DataBaseHelper getInstance(Context ctx) {
@@ -585,7 +627,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public void removeComplicatedProduct(String productName) {
             this.dbW=getWritableDatabase();
-            String query="DELETE FROM "+TABLE_COMPLICATED+" WHERE "+"("+COMPLICATED_NAME+")='"+productName+"'" ;
+            String query="DELETE FROM "+TABLE_COMPLICATED+" WHERE "+"("+COMPLICATED_NAME+") = '"+productName+"'" ;
             dbW.execSQL(query);
     }
 
@@ -593,6 +635,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         this.dbW=getWritableDatabase();
         String query="DELETE FROM "+TABLE_ALLPRODUCTS+" WHERE "+"("+PRODUCT+")='"+productName+"'" ;
         dbW.execSQL(query);
+    }
+
+    public void removeAllBeforeUpdate(){
+        this.dbW=getWritableDatabase();
+        String queryCompl="DELETE FROM "+TABLE_COMPLICATED;
+        String queryDate="DELETE FROM "+TABLE_DATE;
+        String queryMenuDate="DELETE FROM "+TABLE_MENUES_DATES;
+        String queryComplProduct="DELETE FROM "+TABLE_ALLPRODUCTS+" WHERE "+"("+COMPLICATED+")='1'";
+        String queryMenu="DELETE FROM "+TABLE_MENU;
+
+        //String queryDate2="DELETE FROM "+TABLE_MENU;
+        //String queryDate="DELETE FROM "+TABLE_MENUES_DATES;
+        //String queryDate="DELETE FROM "+TABLE_;
+        //String queryDate="DELETE FROM "+TABLE_COMPLICATED;
+        dbW.execSQL(queryDate);
+        dbW.execSQL(queryCompl);
+        dbW.execSQL(queryMenuDate);
+        dbW.execSQL(queryComplProduct);
+        dbW.execSQL(queryMenu);
     }
 }
 

@@ -142,7 +142,7 @@ public class MainListAdapter extends ArrayAdapter<String> {
                     public void onClick(DialogInterface dialog, int id) {
 
                         date = timeDate.get(pos);
-                        db.removeFromMenu(date, eatingType.get(pos).get(i));
+                        db.deleteFromMenu(date, eatingType.get(pos).get(i));
                         removeFromHostingMenu(i);
                         eatingType.get(pos).remove(i);
                         fas.get(pos).remove(i);

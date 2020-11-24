@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity
             FragmentClass = AnalyzesListFragment.class;
         } else if (id == R.id.nav_update) {
             //update();
+            DataBaseHelper.getInstance(this).removeAllBeforeUpdate();
             new Async().execute();
 
         } else if (id == R.id.nav_insert) {
@@ -249,7 +250,7 @@ public class MainActivity extends AppCompatActivity
                         TasksResponse list = response.body().get(i);
                         dataBaseHelper.insertIntoProduct(list.getName() + "|", list.getBelok().replace(",", "."),
                                 list.getJiry().replace(",", "."), list.getUglevod().replace(",", "."),
-                                list.getFa().replace(",", "."), list.getKkal().replace(",", "."), "100",list.getComplicated());
+                                list.getFa().replace(",", "."), list.getKkal().replace(",", "."), list.getGram(),list.getComplicated());
                     }
                 }
                 mUpdatable.updateAdapter();
@@ -360,7 +361,6 @@ public class MainActivity extends AppCompatActivity
                    }
                    mUpdatable.updateAdapter();
                }
-               //progressDialog.dismiss();
            }
 
            @Override
@@ -387,7 +387,8 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Boolean rez) {
             super.onPostExecute(rez);
             mUpdatable.updateAdapter();
-            if (rez) progressDialog.dismiss();
+            progressDialog.dismiss();
+            //if (rez) progressDialog.dismiss();
         }
     }
 }
