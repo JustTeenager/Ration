@@ -14,7 +14,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -272,10 +271,7 @@ public class MainActivity extends AppCompatActivity
                 if (response.isSuccessful()){
                     for (int i = 0; i < response.body().size(); i++) {
                         MenuResponse menuResponse = response.body().get(i);
-                        Log.e("Tut_belki",menuResponse.getBelki());
-                        Log.d("Tut_bool", String.valueOf(dataBaseHelper.getMenuAndDate(menuResponse.getMenu(),menuResponse.getDate()).isEmpty()));
                         if (dataBaseHelper.getMenu(menuResponse.getMenu(),menuResponse.getDate(),menuResponse.getProduct()).isEmpty()) {
-                            Log.d("Tut_db",menuResponse.getBelki());
                             dataBaseHelper.insertIntoMenu(menuResponse.getMenu(), menuResponse.getDate(), menuResponse.getProduct(), menuResponse.getJiry(),
                                     menuResponse.getBelki(), menuResponse.getUglevod(), menuResponse.getFa(), menuResponse.getKl(), menuResponse.getGram(),menuResponse.getComplicated());
                         }
@@ -283,7 +279,6 @@ public class MainActivity extends AppCompatActivity
                     mUpdatable.updateAdapter();
                 }
                 //progressDialog.dismiss();
-                Log.d("Tut", String.valueOf(dataBaseHelper.getMenu1screen("19.11.20","23:47")));
             }
 
             @Override

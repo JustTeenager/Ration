@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -141,7 +140,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
              String jiry, String belki,
              String uglevod, String fa, String kl, String gram,String complicated) {
 
-        Log.d("Tut","вошли в добавление");
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(ID_MENU, menu);
@@ -386,11 +384,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<DateMenuResponse> getMenuAndDate(String menu, String date) {
-       // Log.d("Tut_ID_MENU",ID_MENU);
-        Log.d("Tut_DATE",date);
-        Log.d("Tut_DATE_TRIM",date.trim());
-        Log.d("Tut_MENU",menu);
-        Log.d("Tut_MENU_TRIM",menu.trim());
         ArrayList<DateMenuResponse> all = new ArrayList<>();
         String selectQuery = "SELECT * FROM "
                 + TABLE_MENUES_DATES +
@@ -403,19 +396,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             response.setMenu(c.getString(c.getColumnIndex(ID_MENU)));
             response.setDate(c.getString(c.getColumnIndex(DATE)));
             all.add(response);
-            Log.e("Tut_response", String.valueOf(response.getDate())+"   "+response.getMenu());
         }
-        Log.d("Tut_size", String.valueOf(c.getCount()));
         c.close();
         return all;
     }
 
     public ArrayList<DateMenuResponse> getMenu(String menu, String date,String product) {
-        // Log.d("Tut_ID_MENU",ID_MENU);
-        Log.d("Tut_DATE",date);
-        Log.d("Tut_DATE_TRIM",date.trim());
-        Log.d("Tut_MENU",menu);
-        Log.d("Tut_MENU_TRIM",menu.trim());
+
         ArrayList<DateMenuResponse> all = new ArrayList<>();
         String selectQuery = "SELECT * FROM "
                 + TABLE_MENU +
@@ -430,9 +417,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             response.setMenu(c.getString(c.getColumnIndex(ID_MENU)));
             response.setDate(c.getString(c.getColumnIndex(DATE)));
             all.add(response);
-            Log.e("Tut_response", String.valueOf(response.getDate())+"   "+response.getMenu());
         }
-        Log.d("Tut_size", String.valueOf(c.getCount()));
         c.close();
         return all;
     }
@@ -466,7 +451,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             dbW.execSQL(removeMenu);
             dbW.execSQL(removeMenuDates);
             if (getMenues(date).isEmpty()) {
-                Log.e("MENU", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
                 //removeDateFromHosting(date);
@@ -486,7 +470,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             dbW.execSQL(removeMenu);
             dbW.execSQL(removeMenuDates);
             if (getMenues(date).isEmpty()) {
-                Log.e("MENU", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
                 removeDateFromHosting(date);
@@ -505,8 +488,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful())
-                    Log.d("Response",response.body());
+
             }
 
             @Override
@@ -523,10 +505,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String removeMenu = "DELETE FROM " + TABLE_MENU + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
                     + "(" + ID_MENU + ") = '" + menu + "' AND "
                     + "(" + PRODUCT + ") = '" + product + "'";
-            Log.d("removeFromMenu_Tut","вошли в метод");
             dbW.execSQL(removeMenu);
             if (getMenues(date).isEmpty()) {
-                Log.e("MENU2", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
                 //removeDateFromHosting(date);
@@ -544,10 +524,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String removeMenu = "DELETE FROM " + TABLE_MENU + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
                     + "(" + ID_MENU + ") = '" + menu + "' AND "
                     + "(" + PRODUCT + ") = '" + product + "'";
-            Log.d("removeFromMenu_Tut","вошли в метод");
             dbW.execSQL(removeMenu);
             if (getMenues(date).isEmpty()) {
-                Log.e("MENU2", String.valueOf(getMenues(date)));
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
                 removeDateFromHosting(date);
@@ -645,10 +623,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         String queryComplProduct="DELETE FROM "+TABLE_ALLPRODUCTS+" WHERE "+"("+COMPLICATED+")='1'";
         String queryMenu="DELETE FROM "+TABLE_MENU;
 
-        //String queryDate2="DELETE FROM "+TABLE_MENU;
-        //String queryDate="DELETE FROM "+TABLE_MENUES_DATES;
-        //String queryDate="DELETE FROM "+TABLE_;
-        //String queryDate="DELETE FROM "+TABLE_COMPLICATED;
         dbW.execSQL(queryDate);
         dbW.execSQL(queryCompl);
         dbW.execSQL(queryMenuDate);

@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -111,8 +110,6 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
     public void removeProduct(int position) {
         deletedStringsList.add(productMaterials.get(position).getStringExtra(PRODUCTS));
         productMaterials.remove(position);
-        Log.e("pos", String.valueOf(position));
-        Log.e("pr_size", String.valueOf(productMaterials.size()));
         listProteins.remove(position);
         listFats.remove(position);
         listCarb.remove(position);
@@ -263,13 +260,11 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    Log.e("TEXT","changing");
                     if (!s.toString().isEmpty()) {
                         if (mTotalGrEditText.getText().toString().isEmpty())
                             mTextViewGr.setText("0");
                         gr = Double.parseDouble(mTotalGrEditText.getText().toString());
                         if (gr > 0) {
-                            Log.e("TEXT","calcs "+gr/listGr.get(postition));
                             calculate(gr / listGr.get(postition));
                             listGr.set(postition, gr);
                             productMaterials.get(postition).putExtra(GR, mTotalGrEditText.getText().toString());
@@ -284,7 +279,6 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
             };
 
             //mTotalGrEditText.setText(String.valueOf(gr));
-            Log.e("total_text",mTotalGrEditText.getText().toString());
             mTotalGrEditText.addTextChangedListener(watcher);
             //mEditTextGr=
         }
@@ -298,7 +292,6 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
             kl100 = getListKl().get(postition);
 
             ///рез-т=предыдущие белки/предыдущие граммы * на новые граммы
-            Log.e("grams= ", String.valueOf(getListGr().get(postition)));
             proteins = proteins100 * coeff;
             getListProteins().set(postition, proteins);
             fats = fats100 * coeff;
@@ -310,14 +303,7 @@ public class ComplicatedProductAdapter extends RecyclerView.Adapter<ComplicatedP
             kl = kl100 * coeff;
             getListKl().set(postition, kl);
 
-            Log.e("proteins= ", String.valueOf(getListProteins().get(postition)));
-
-            Log.e("fats= ", String.valueOf(getListFats().get(postition)));
-            Log.e("carb= ", String.valueOf(getListCarb().get(postition)));
-
-
             textViewProteins.setText(decimalFormat.format(proteins));
-            Log.e("proteins2= ", textViewProteins.getText().toString());
             textViewFats.setText(decimalFormat.format(fats));
             textViewCarbohydrates.setText(decimalFormat.format(carb));
             textViewFA.setText(decimalFormat.format(fa));

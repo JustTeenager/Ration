@@ -19,7 +19,7 @@ public class Constants {
     public static String TIME = "time";
     public static String ID_PRODUCT = "id_product";
 
-    public static String MAIN_URL_CONST = "https://www.fkusoft.ru";
+    public static String MAIN_URL_CONST = "https://sh1604917.a.had.su";
     public static String PROD_SEARCH = "prod_search";
 
     public static final String YEAR = "year";

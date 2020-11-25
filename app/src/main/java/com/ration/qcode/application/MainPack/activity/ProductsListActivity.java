@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -150,7 +149,6 @@ public class ProductsListActivity extends AppCompatActivity implements AdapterVi
         intent.putExtra(KL, kl.get(i));
         intent.putExtra(GR, gr.get(i));
         intent.putExtra(SearchComplicatedProductActivity.NAME,getIntent().getStringExtra(SearchComplicatedProductActivity.NAME));
-        Log.d("INTENTIK", String.valueOf(getIntent().getStringExtra(SearchComplicatedProductActivity.NAME)));
         intent.putExtra(ID_PRODUCT,getIntent().getIntExtra(ID_PRODUCT,-1));
         intent.putExtra(COMPLICATED,isComplicated.get(i));
 

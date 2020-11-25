@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -95,7 +94,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("Create","complicatedSearch");
         setContentView(R.layout.activity_search_complicated_product);
 
         Gson gson= new GsonBuilder().setLenient().create();
@@ -180,7 +178,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
             }
             else {
-                Log.e("setEditText","сетим");
                 adapter.setEditText(mProductGrEditText);
                 ArrayList<Intent> intentsList = DataBaseHelper.getInstance(this).getFromComplicated(intent.getStringExtra(PRODUCTS));
                 productNameEditText.setText(intent.getStringExtra(PRODUCTS));
@@ -198,7 +195,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (getIntent().getStringExtra(NAME)!=null) {
-            Log.d("INTENTIK","workingInSearch");
             productNameEditText.setText(getIntent().getStringExtra(NAME));
         }
     }
@@ -214,7 +210,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             inten.putExtra(DATE, date);
         }
         inten.putExtra(NAME,productName);
-        Log.e("INTENTIK", String.valueOf(getIntent().getStringExtra(NAME)));
         inten.putExtra(ID_PRODUCT,getIntent().getIntExtra(ID_PRODUCT,-1));
         inten.putExtra(PROD_SEARCH, editTextSearch.getText().toString());
         inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -250,7 +245,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 fa100=adapter.getListFa().get(i);
                 kl100=adapter.getListKl().get(i);
 
-                Log.e("grams= ", String.valueOf(adapter.getListGr().get(i)));
                 proteins += proteins100 / adapter.getListGr().get(i) * grams;
                 fats += fats100 / adapter.getListGr().get(i) * grams;
                 carb += carb100 / adapter.getListGr().get(i) * grams;
@@ -307,8 +301,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 intentProduct.putExtra(DATE, date);
             }
 
-            Log.d("ВЫЗЫВАЕТСЯ ХУЙНЯ ", String.valueOf(intent.getIntExtra(ID_PRODUCT,228)));
-
             if (intent.getIntExtra(ID_PRODUCT, -1) != -1) {
 
                 int item = intent.getIntExtra(ID_PRODUCT, -1);
@@ -325,7 +317,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
             }
             else {
                 intentProduct.putExtra("from Add", "yes");
-                Log.d("ВЫЗЫВАЕТСЯ ХУЙНЯ ","ХУЙНЯ");
                 ProductInfoActivity.products.add(productName);
                 ProductInfoActivity.proteins.add("" + proteins);
                 ProductInfoActivity.fats.add("" + fats);
@@ -347,7 +338,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
                 if (!DataBaseHelper.getInstance(this).getCheckFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS)))
                 {
-                    Log.e("adapter_removeSize", String.valueOf(productRecView.getAdapter().getItemCount()));
                     DataBaseHelper.getInstance(this).insertIntoComplicated(productName, complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FATS),
                             complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
                             complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
@@ -357,7 +347,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                 }
 
                 else if(DataBaseHelper.getInstance(this).getCheckGrFromComplicated(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListGr().get(i)))){
-                    Log.e("another","working");
                     DataBaseHelper.getInstance(this).updateGrams(productName,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListFats().get(i)),String.valueOf(complicatedProductAdapter.getListProteins().get(i)),String.valueOf(complicatedProductAdapter.getListCarb().get(i)),String.valueOf(complicatedProductAdapter.getListFa().get(i)),String.valueOf(complicatedProductAdapter.getListKl().get(i)),String.valueOf(complicatedProductAdapter.getListGr().get(i)));
                     updateGrIntoHosting(i);
                 }
@@ -382,7 +371,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         } else {
             if (adapter.getProductMaterials().isEmpty()) {
                 try {
-                    Log.e("adapter_removeSize", String.valueOf(adapter.getProductMaterials().isEmpty()));
                     Intent intent = getIntent();
                     ProductInfoActivity.isComplicated.remove(intent.getStringExtra(COMPLICATED));
                     ProductInfoActivity.carbohydrates.remove(intent.getStringExtra(CARBOHYDRATES));
@@ -395,7 +383,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     DataBaseHelper.getInstance(this).removeFromMenu(date, menu, productName + "|");
                     removeFromHostingMenu(date, menu, productName + "|");
                     DataBaseHelper.getInstance(this).removeComplicatedProduct(productName);
-                    Log.e("adapter_removeSize", productName);
                     DataBaseHelper.getInstance(this).removeProduct(productName+"|");
                     removeComplicatedProductFromHosting(productName);
                 }catch (Exception e){}
@@ -415,13 +402,10 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         new Callback<AddProductResponse>() {
                             @Override
                             public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                                if (response.isSuccessful())
-                                Log.d("INSERT_COMPL_IN_OST", String.valueOf(response.body()));
                             }
 
                             @Override
                             public void onFailure(Call<AddProductResponse> call, Throwable t) {
-                                Log.e("INSERT_COMPL_IN_OST", String.valueOf(t));
                             }
                         });
     }
@@ -448,8 +432,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.e("Tut_removeComplFromH","onResponse");
-                if (response.isSuccessful()){ Log.e("Tut_removeComplFromH","удачный onResponse");}
             }
 
             @Override
@@ -484,9 +466,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()){
-                    Log.e("vseharasho","response");
-                }
             }
             @Override
             public void onFailure(Call<String> call, Throwable t) {
@@ -515,7 +494,6 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Log.e("home","tapped");
                 onBackPressed();
                 break;
         }

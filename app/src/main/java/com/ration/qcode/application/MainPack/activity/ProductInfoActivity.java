@@ -8,7 +8,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -166,7 +165,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
         adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
                 products, proteins, fats, carbohydrates, fas, kl, gr);
-        Log.e("adapter_size", String.valueOf(adapter.getCount()));
         listViewProducts.setAdapter(adapter);
 
 
@@ -223,20 +221,17 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     private void setAdapter() {
         adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
                 products, proteins, fats, carbohydrates, fas, kl, gr);
-        Log.e("adapter_size_setAdapter", String.valueOf(adapter.getCount()));
         listViewProducts.setOnItemClickListener(this);
         listViewProducts.setAdapter(adapter);
     }
 
     private void replaceFromHostingMenu(String date, String menu, String product, String s, String s1, String s2, String s3, String s4, String s5, String s6){
-        Log.e("REPLACE_Tut","вошли в метод");
         ReplaceMenuAPI replaceMenuAPI=mRetrofit.create(ReplaceMenuAPI.class);
         Call<String> call=replaceMenuAPI.insertProduct(menu,date,product,s,s1,s2,s3,s4,s5,s6);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()){
-                    Log.e("Tut_REPLACED",response.body());
                 }
             }
 
@@ -293,7 +288,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
             db.removeFromMenu(date, menu);
             //
-            Log.e("data_tut "+date,"обычная дата");
             insertInHostingIntoDate(date);
             if (!products.isEmpty()) {
                 if (!db.getDates().contains(date)) {
@@ -307,7 +301,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                   /*  insertInHostingIntoMenu(menu, date, products.get(i) + "|", fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i),isComplicated.get(i));*/
-                    Log.d("Tut_i_v_fore ", String.valueOf(i));
                     replaceFromHostingMenu(date,menu,products.get(i) + "|",fats.get(i), proteins.get(i),
                             carbohydrates.get(i), fas.get(i), kl.get(i), gr.get(i), isComplicated.get(i));
                 }
@@ -319,7 +312,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
             if (!products.isEmpty()) {
                // boolean isDateWrited=false;
                 if (size == 0) {
-                    Log.e("data_tut "+dateNow,"необычная дата");
                     db.insertDate(dateNow);
                     //insertInHostingIntoDate(dateNow);
                     db.insertMenuDates(timeNow, dateNow);
@@ -377,16 +369,13 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
                 .getDateJSONApi()
                 .insertDate(date)
-                .enqueue(new Callback<AddProductResponse>() {
+                .enqueue(new Callback<String>() {
                     @Override
-                    public void onResponse(Call<AddProductResponse> call, Response<AddProductResponse> response) {
-                    Log.e("data_tut","вошли в онРеспонс");
-                    if(response.isSuccessful())  Log.e("data_tut","онРеспонс успешен");
+                    public void onResponse(Call<String> call, Response<String> response) {
                     }
 
                     @Override
-                    public void onFailure(Call<AddProductResponse> call, Throwable t) {
-                        Log.e("data_tut","пососали "+t);
+                    public void onFailure(Call<String> call, Throwable t) {
                     }
                 });
     }
@@ -470,7 +459,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                         adapter = new ProductsInfoListAdapter(getApplicationContext(),
                                 R.layout.productsinfo_list_item,
                                 products, proteins, fats, carbohydrates, fas, kl, gr);
-                        Log.e("adapter_size_product", String.valueOf(adapter.getCount()));
                         listViewProducts.setAdapter(adapter);
                         common();
                     }
@@ -494,8 +482,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful())
-                    Log.d("Response",response.body());
             }
 
             @Override
