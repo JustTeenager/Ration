@@ -48,4 +48,9 @@
     <string name="no_complicated_product">не составной</string>
     <string name="enter_a_name">Введите имя продукта!</string>
     <string name="edit_gr_edit">Введите граммы:</string>
+    <string name="change_url">Изменить домен</string>
+    <string name="cancel">Отменить</string>
+    <string name="OK">Принять</string>
+    <string name="empty_url">Вы ввели пустой домен!</string>
+    <string name="url_change_hint">Пишите url в подходящем формате</string>
 </resources>

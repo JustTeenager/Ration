@@ -14,19 +14,20 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
 
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
+import com.ration.qcode.application.utils.SharedPrefManager;
 import com.ration.qcode.application.utils.SwipeDetector;
+import com.ration.qcode.application.utils.internet.AddDateAPI;
+import com.ration.qcode.application.utils.internet.AddMenuAPI;
+import com.ration.qcode.application.utils.internet.AddMenuDateAPI;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
-import com.ration.qcode.application.utils.internet.DeleteFromDateAPI;
-import com.ration.qcode.application.utils.internet.RemoveFromMenu;
-import com.ration.qcode.application.utils.internet.RemoveProductFromMenu;
+import com.ration.qcode.application.utils.internet.RemoveFromMenuAPI;
+import com.ration.qcode.application.utils.internet.RemoveProductFromMenuAPI;
 import com.ration.qcode.application.utils.internet.ReplaceMenuAPI;
 
 import java.text.DateFormat;
@@ -38,8 +39,6 @@ import java.util.Date;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
 import static com.ration.qcode.application.utils.Constants.COMPLICATED;
@@ -50,7 +49,6 @@ import static com.ration.qcode.application.utils.Constants.GR;
 import static com.ration.qcode.application.utils.Constants.ID_PRODUCT;
 import static com.ration.qcode.application.utils.Constants.INFO;
 import static com.ration.qcode.application.utils.Constants.KL;
-import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 import static com.ration.qcode.application.utils.Constants.MENU;
 import static com.ration.qcode.application.utils.Constants.PRODUCTS;
 import static com.ration.qcode.application.utils.Constants.PROTEINS;
@@ -64,7 +62,6 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
     private TextView textProteins, textFats, textCarbohydrates, textKilos, textGramm, textFA;
     private ListView listViewProducts;
-    private Retrofit mRetrofit;
 
     DataBaseHelper db;
 
@@ -106,11 +103,11 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        Gson gson= new GsonBuilder().setLenient().create();
-        mRetrofit = new Retrofit.Builder()
+        //Gson gson= new GsonBuilder().setLenient().create();
+        /*mRetrofit = new Retrofit.Builder()
                 .baseUrl(MAIN_URL_CONST)
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+                .build();*/
 
 
         textProteins = (TextView) findViewById(R.id.textProteins);
@@ -218,21 +215,12 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         return super.onOptionsItemSelected(item);
     }
 
-    private void setAdapter() {
-        adapter = new ProductsInfoListAdapter(this, R.layout.productsinfo_list_item,
-                products, proteins, fats, carbohydrates, fas, kl, gr);
-        listViewProducts.setOnItemClickListener(this);
-        listViewProducts.setAdapter(adapter);
-    }
-
     private void replaceFromHostingMenu(String date, String menu, String product, String s, String s1, String s2, String s3, String s4, String s5, String s6){
-        ReplaceMenuAPI replaceMenuAPI=mRetrofit.create(ReplaceMenuAPI.class);
+        ReplaceMenuAPI replaceMenuAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(ReplaceMenuAPI.class);
         Call<String> call=replaceMenuAPI.insertProduct(menu,date,product,s,s1,s2,s3,s4,s5,s6);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()){
-                }
             }
 
             @Override
@@ -247,8 +235,8 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void removeFromHostingMenu(String date,String menu) {
-        RemoveFromMenu removeFromMenu=mRetrofit.create(RemoveFromMenu.class);
-        Call<String> call=removeFromMenu.removeFromMenu(menu,date);
+        RemoveFromMenuAPI removeFromMenuAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(RemoveFromMenuAPI.class);
+        Call<String> call= removeFromMenuAPI.removeFromMenu(menu,date);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -264,13 +252,11 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
     private void removeFromHostingMenu(String date,String menu,String product) {
 
-        RemoveProductFromMenu removeProductFromMenu=mRetrofit.create(RemoveProductFromMenu.class);
-        Call<String> call=removeProductFromMenu.removeProductFromMenu(menu,date,product);
+        RemoveProductFromMenuAPI removeProductFromMenuAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(RemoveProductFromMenuAPI.class);
+        Call<String> call= removeProductFromMenuAPI.removeProductFromMenu(menu,date,product);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                }
             }
 
             @Override
@@ -280,7 +266,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
 
-    public void saveToDB(View view) {
+    public void saveToDB() {
         intent = getIntent();
         if (intent.getStringExtra("From menu") != null) {
             String date = intent.getStringExtra(DATE);
@@ -351,7 +337,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     private void insertInHostingIntoMenu(String menu, String date, String product, String fats, String proteins, String carbohydrates,
                                          String fas, String kl, String gr,String complicated) {
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
-                .getMenuJSONApi()
+                .getApi(AddMenuAPI.class)
                 .insertProduct(menu,date,product,fats, proteins,carbohydrates,fas,kl,gr,complicated)
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
@@ -367,7 +353,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
     private void insertInHostingIntoDate(String date){
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
-                .getDateJSONApi()
+                .getApi(AddDateAPI.class)
                 .insertDate(date)
                 .enqueue(new Callback<String>() {
                     @Override
@@ -382,7 +368,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
     private void insertInHostingIntoDateMenu(String menu, String date){
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
-                .getMenuDateJSONApi()
+                .getApi(AddMenuDateAPI.class)
                 .insertDateMenu(menu,date)
                 .enqueue(new Callback<AddProductResponse>() {
                     @Override
@@ -441,10 +427,10 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        db.deleteFromMenu(date, menu, products.get(position) + "|");
+                        db.deleteFromMenu(date, menu, products.get(position) + "|",ProductInfoActivity.this);
                         removeFromHostingMenu(date,menu,products.get(position)+"|");
                         if (db.getProducts(date, menu).isEmpty()) {
-                            db.deleteFromMenu(date, menu);
+                            db.deleteFromMenu(date, menu,ProductInfoActivity.this);
                             removeFromHostingMenu(date,menu);
                         }
 
@@ -471,7 +457,8 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
         alert.show();
     }
 
-    private void removeDateFromHosting(String date){
+    /*private void removeDateFromHosting(String date){
+
         Gson gson=new GsonBuilder().setLenient().create();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MAIN_URL_CONST)
@@ -489,7 +476,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
             }
         });
-    }
+    }*/
 
 
     public void clearAll() {

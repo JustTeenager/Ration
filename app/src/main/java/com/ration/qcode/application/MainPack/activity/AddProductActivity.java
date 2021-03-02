@@ -137,7 +137,7 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
 
-    public void addItem(View view) {
+    public void addItem() {
 
         if(!dateOfPay()) {
             calculation();
@@ -186,7 +186,7 @@ public class AddProductActivity extends AppCompatActivity {
         }
     }
 
-    public void searchProduct(View view) {
+    public void searchProduct() {
 
         Intent inten = new Intent(this, ProductsListActivity.class);
         if (intent.getStringExtra("From menu") != null) {
@@ -212,7 +212,7 @@ public class AddProductActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void calculate(View view) {
+    public void calculate() {
         calculation();
     }
 

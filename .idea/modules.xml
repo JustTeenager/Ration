@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Ration.iml" filepath="$PROJECT_DIR$/Ration.iml" group="Ration" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Ration-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Ration-app.iml" group="Ration/app" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RationTesting.iml" filepath="$PROJECT_DIR$/.idea/modules/RationTesting.iml" group="RationTesting" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/RationTesting-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/RationTesting-app.iml" group="RationTesting/app" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="Ration/app" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libGDX-Ration.iml" filepath="$PROJECT_DIR$/.idea/modules/libGDX-Ration.iml" group="Ration" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RationTesting.iml" filepath="$PROJECT_DIR$/.idea/modules/RationTesting.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/RationTesting.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/RationTesting.app.iml" />
     </modules>
   </component>
 </project>

@@ -17,15 +17,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.dialog.AddProductDialog;
+import com.ration.qcode.application.MainPack.dialog.ChangeURLDialog;
 import com.ration.qcode.application.MainPack.fragment.AnalyzesListFragment;
 
 import com.ration.qcode.application.MainPack.fragment.MainListFragment;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.AdapterUpdatable;
+import com.ration.qcode.application.utils.NetworkService;
+import com.ration.qcode.application.utils.SharedPrefManager;
 import com.ration.qcode.application.utils.internet.ComplicatedResponse;
 import com.ration.qcode.application.utils.internet.DateMenuResponse;
 import com.ration.qcode.application.utils.internet.DateResponse;
@@ -37,21 +38,15 @@ import com.ration.qcode.application.utils.internet.IGetAllMenuDateAPI;
 import com.ration.qcode.application.utils.internet.MenuResponse;
 import com.ration.qcode.application.utils.internet.TasksResponse;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.ration.qcode.application.utils.Constants.DAY;
 import static com.ration.qcode.application.utils.Constants.HOUR;
-import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 import static com.ration.qcode.application.utils.Constants.MINUTE;
 import static com.ration.qcode.application.utils.Constants.MONTH;
 import static com.ration.qcode.application.utils.Constants.YEAR;
@@ -65,7 +60,7 @@ public class MainActivity extends AppCompatActivity
     private static final String CLIENT_ID = "F4C33E5FDE2D3BB4892D4FEBCAA10A8ED53525BAF383F4A2F76BBE8587CED803";
     private static final String HOST = "https://money.yandex.ru";
     private SharedPreferences preferences;
-    private Retrofit retrofit;
+    //private Retrofit retrofit;
 
     private AdapterUpdatable mUpdatable;
 
@@ -73,11 +68,11 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Gson gson = new GsonBuilder().setLenient().create();
+        /*Gson gson = new GsonBuilder().setLenient().create();
         retrofit = new Retrofit.Builder()
                 .baseUrl(MAIN_URL_CONST)
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+                .build();*/
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(getString(R.string.wait));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -90,6 +85,9 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("DOWNLOAD", "false");
             ed.commit();
+
+            SharedPrefManager.getManager(this).setUrl("https://sh1604917.a.had.su");
+
 
             new Async().execute();
             //update();
@@ -158,7 +156,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
@@ -176,7 +173,8 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_insert) {
             callDialogInsertProduct();
-        } else {
+        } else if (id==R.id.nav_change_link){
+            callDialogChangeURL();
         }
 
         try {
@@ -186,6 +184,12 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void callDialogChangeURL() {
+        ChangeURLDialog dialog=new ChangeURLDialog();
+        dialog.setCancelable(false);
+        dialog.show(getSupportFragmentManager(),null);
     }
 
     @Override
@@ -219,27 +223,10 @@ public class MainActivity extends AppCompatActivity
         getComplicatedMenu();
         getAllDateApi();
         getAllDateMenuApi();
-        /*Thread thread=new Thread(new Runnable() {
-            @Override
-            public void run() {
-                getAllTasksApi();
-                getAllMenuApi();
-                getComplicatedMenu();
-                getAllDateApi();
-                getAllDateMenuApi();
-            }
-        });
-        thread.run();
-        try {
-            thread.join();
-            progressDialog.dismiss();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
     }
 
     private void getAllTasksApi() {
-        IGetAllDataAPI allTasksApi = retrofit.create(IGetAllDataAPI.class);
+        IGetAllDataAPI allTasksApi=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(IGetAllDataAPI.class);
         Call<List<TasksResponse>> call = allTasksApi.getAllTasks();
         call.enqueue(new Callback<List<TasksResponse>>() {
             @Override
@@ -263,7 +250,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getAllMenuApi() {
-        IGetAllMenuAPI allMenuAPI = retrofit.create(IGetAllMenuAPI.class);
+        IGetAllMenuAPI allMenuAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(IGetAllMenuAPI.class);
         Call<List<MenuResponse>> menuResponses = allMenuAPI.getAllMenu();
         menuResponses.enqueue(new Callback<List<MenuResponse>>() {
             @Override
@@ -287,7 +274,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getComplicatedMenu(){
-        IGetAllComplicatedAPI complicatedAPI=retrofit.create(IGetAllComplicatedAPI.class);
+        IGetAllComplicatedAPI complicatedAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(IGetAllComplicatedAPI.class);
         Call<List<ComplicatedResponse>> call=complicatedAPI.queryComplicated();
         call.enqueue(new Callback<List<ComplicatedResponse>>() {
             @Override
@@ -315,7 +302,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getAllDateMenuApi() {
-        IGetAllMenuDateAPI menuDateAPI = retrofit.create(IGetAllMenuDateAPI.class);
+        IGetAllMenuDateAPI menuDateAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(IGetAllMenuDateAPI.class);
         Call<List<DateMenuResponse>> call = menuDateAPI.getAllMenuDate();
         call.enqueue(new Callback<List<DateMenuResponse>>() {
             @Override
@@ -339,8 +326,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getAllDateApi() {
-       IGetAllDateAPI getAllDateAPI = retrofit.create(IGetAllDateAPI.class);
-       Call<List<DateResponse>> call = getAllDateAPI.getAllDate();
+        IGetAllDateAPI getAllDateAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(IGetAllDateAPI.class);
+        Call<List<DateResponse>> call = getAllDateAPI.getAllDate();
        call.enqueue(new Callback<List<DateResponse>>() {
            @Override
            public void onResponse(Call<List<DateResponse>> call, Response<List<DateResponse>> response) {
@@ -350,9 +337,7 @@ public class MainActivity extends AppCompatActivity
                        if (dataBaseHelper.getDates(list.getDate()).isEmpty()) {
                            dataBaseHelper.insertDate(list.getDate());
                        }
-                       else{
-                         //  dataBaseHelper.insertDate(new SimpleDateFormat("dd.MM.yy").format(new Date()));
-                       }
+
                    }
                    mUpdatable.updateAdapter();
                }

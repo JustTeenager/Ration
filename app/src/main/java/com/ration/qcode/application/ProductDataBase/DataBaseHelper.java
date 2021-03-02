@@ -7,9 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.utils.Constants;
+import com.ration.qcode.application.utils.NetworkService;
+import com.ration.qcode.application.utils.SharedPrefManager;
 import com.ration.qcode.application.utils.internet.DateMenuResponse;
 import com.ration.qcode.application.utils.internet.DeleteFromDateAPI;
 
@@ -19,10 +19,6 @@ import java.util.Collections;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 
 /**
  * @author zeza on 06.04.2017.
@@ -458,7 +454,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteFromMenu(String date, String menu) {
+    public void deleteFromMenu(String date, String menu,Context context) {
         dbW = this.getWritableDatabase();
         if (date == null || menu == null) {
 
@@ -472,18 +468,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             if (getMenues(date).isEmpty()) {
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
-                removeDateFromHosting(date);
+                removeDateFromHosting(date,context);
             }
         }
     }
 
-    private void removeDateFromHosting(String date){
-        Gson gson=new GsonBuilder().setLenient().create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MAIN_URL_CONST)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        DeleteFromDateAPI deleteFromDateAPI=retrofit.create(DeleteFromDateAPI.class);
+    private void removeDateFromHosting(String date,Context context){
+
+        DeleteFromDateAPI deleteFromDateAPI= NetworkService.getInstance(SharedPrefManager.getManager(context).getUrl()).getApi(DeleteFromDateAPI.class);
         Call<String> call=deleteFromDateAPI.removeDate(date);
         call.enqueue(new Callback<String>() {
             @Override
@@ -518,7 +510,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public void deleteFromMenu(String date, String menu, String product) {
+    public void deleteFromMenu(String date, String menu, String product,Context context) {
         dbW = this.getWritableDatabase();
         try {
             String removeMenu = "DELETE FROM " + TABLE_MENU + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "' AND "
@@ -528,7 +520,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             if (getMenues(date).isEmpty()) {
                 String removeDate = "DELETE FROM " + TABLE_DATE + " WHERE TRIM(" + DATE + ") = '" + date.trim() + "'";
                 dbW.execSQL(removeDate);
-                removeDateFromHosting(date);
+                removeDateFromHosting(date,context);
             }
         }
         catch (Exception e) {

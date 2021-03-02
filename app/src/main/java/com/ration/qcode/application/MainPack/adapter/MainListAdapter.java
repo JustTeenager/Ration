@@ -13,13 +13,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.activity.ProductInfoActivity;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
+import com.ration.qcode.application.utils.NetworkService;
+import com.ration.qcode.application.utils.SharedPrefManager;
 import com.ration.qcode.application.utils.SwipeDetector;
-import com.ration.qcode.application.utils.internet.RemoveFromMenu;
+import com.ration.qcode.application.utils.internet.RemoveFromMenuAPI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,9 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.ration.qcode.application.utils.Constants.DATE;
 import static com.ration.qcode.application.utils.Constants.INFO;
-import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 import static com.ration.qcode.application.utils.Constants.MENU;
 
 public class MainListAdapter extends ArrayAdapter<String> {
@@ -97,7 +94,7 @@ public class MainListAdapter extends ArrayAdapter<String> {
                 } else {
                     pos = position;
 
-                    addtoList(i);
+                    addtoList();
 
                     Intent intent = new Intent(mContext, ProductInfoActivity.class);
                     intent.putExtra(INFO, "list");
@@ -141,7 +138,7 @@ public class MainListAdapter extends ArrayAdapter<String> {
                     public void onClick(DialogInterface dialog, int id) {
 
                         date = timeDate.get(pos);
-                        db.deleteFromMenu(date, eatingType.get(pos).get(i));
+                        db.deleteFromMenu(date, eatingType.get(pos).get(i),mContext);
                         removeFromHostingMenu(i);
                         eatingType.get(pos).remove(i);
                         fas.get(pos).remove(i);
@@ -164,13 +161,8 @@ public class MainListAdapter extends ArrayAdapter<String> {
     }
 
     private void removeFromHostingMenu(int i) {
-        Gson gson= new GsonBuilder().setLenient().create();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(MAIN_URL_CONST)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        RemoveFromMenu removeFromMenu=retrofit.create(RemoveFromMenu.class);
-        Call<String> call=removeFromMenu.removeFromMenu(eatingType.get(pos).get(i),date);
+        RemoveFromMenuAPI removeFromMenuAPI = NetworkService.getInstance(SharedPrefManager.getManager(mContext).getUrl()).getApi(RemoveFromMenuAPI.class);
+        Call<String> call= removeFromMenuAPI.removeFromMenu(eatingType.get(pos).get(i),date);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -183,7 +175,7 @@ public class MainListAdapter extends ArrayAdapter<String> {
         });
     }
 
-    private void addtoList(final int i) {
+    private void addtoList() {
         date = timeDate.get(pos);
         notifyDataSetChanged();
     }

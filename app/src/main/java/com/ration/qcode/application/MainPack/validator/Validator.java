@@ -20,9 +20,7 @@ public class Validator {
     public boolean validetName(String name){
         if(!name.equals(null)){
             if(!name.equals("")){
-                if(name.length()>=2){
-                    return true;
-                }
+                return name.length() >= 2;
             }
         }
         return false;
@@ -35,9 +33,7 @@ public class Validator {
      */
     public boolean validetFA(String fa){
         if(!fa.equals(null)){
-            if(!fa.equals("")){
-                return true;
-            }
+            return !fa.equals("");
         }
         return false;
     }
@@ -49,9 +45,7 @@ public class Validator {
      */
     public boolean validetKkal(String kkal){
         if(!kkal.equals(null)){
-            if(!kkal.equals("")){
-                return true;
-            }
+            return !kkal.equals("");
         }
         return false;
     }
@@ -64,9 +58,7 @@ public class Validator {
 
     public boolean validetBelki(String belki){
         if(!belki.equals(null)){
-            if(!belki.equals("")){
-                return true;
-            }
+            return !belki.equals("");
         }
         return false;
     }
@@ -78,9 +70,7 @@ public class Validator {
      */
     public boolean validetUglevod(String uglevod){
         if(!uglevod.equals(null)){
-            if(!uglevod.equals("")){
-                return true;
-            }
+            return !uglevod.equals("");
         }
         return false;
     }
@@ -92,9 +82,7 @@ public class Validator {
      */
     public boolean validetJiry(String jiry){
         if(!jiry.equals(null)){
-            if(!jiry.equals("")){
-                return true;
-            }
+            return !jiry.equals("");
         }
         return false;
     }

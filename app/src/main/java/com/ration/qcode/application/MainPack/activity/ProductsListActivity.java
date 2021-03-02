@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.ration.qcode.application.MainPack.adapter.ComplicatedProductAdapter;
 import com.ration.qcode.application.MainPack.adapter.ProductsInfoListAdapter;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;

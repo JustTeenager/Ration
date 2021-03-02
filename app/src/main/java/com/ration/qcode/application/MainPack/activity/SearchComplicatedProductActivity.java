@@ -1,6 +1,5 @@
 package com.ration.qcode.application.MainPack.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,16 +19,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ration.qcode.application.MainPack.adapter.ComplicatedProductAdapter;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
+import com.ration.qcode.application.utils.SharedPrefManager;
+import com.ration.qcode.application.utils.internet.AddComplicatedAPI;
+import com.ration.qcode.application.utils.internet.AddProductAPI;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
 import com.ration.qcode.application.utils.internet.IRemoveProductAPI;
-import com.ration.qcode.application.utils.internet.RemoveProductFromMenu;
+import com.ration.qcode.application.utils.internet.RemoveProductFromMenuAPI;
 import com.ration.qcode.application.utils.internet.UpdateGrAPI;
 import com.ration.qcode.application.utils.internet.UpdateProductAPI;
 
@@ -39,8 +39,6 @@ import java.util.Calendar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.ration.qcode.application.utils.Constants.CARBOHYDRATES;
 import static com.ration.qcode.application.utils.Constants.COMPLICATED;
@@ -53,7 +51,6 @@ import static com.ration.qcode.application.utils.Constants.HOUR;
 import static com.ration.qcode.application.utils.Constants.ID_PRODUCT;
 import static com.ration.qcode.application.utils.Constants.INFO;
 import static com.ration.qcode.application.utils.Constants.KL;
-import static com.ration.qcode.application.utils.Constants.MAIN_URL_CONST;
 import static com.ration.qcode.application.utils.Constants.MENU;
 import static com.ration.qcode.application.utils.Constants.MINUTE;
 import static com.ration.qcode.application.utils.Constants.MONTH;
@@ -73,7 +70,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
     private EditText mProductGrEditText;
 
-    private Retrofit retrofit;
+    //private Retrofit retrofit;
 
     private TextView textBelLevel;
     private TextView textFALevel;
@@ -96,11 +93,11 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_complicated_product);
 
-        Gson gson= new GsonBuilder().setLenient().create();
+        /*Gson gson= new GsonBuilder().setLenient().create();
         retrofit = new Retrofit.Builder()
                 .baseUrl(MAIN_URL_CONST)
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+                .build();*/
         editTextSearch= (EditText) findViewById(R.id.editSearch);
         productNameEditText= (EditText) findViewById(R.id.product_name);
 
@@ -119,7 +116,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         searchProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchProduct(view);
+                searchProduct();
             }
         });
 
@@ -199,7 +196,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         }
     }
 
-    public void searchProduct(View view) {
+    public void searchProduct() {
 
         Intent inten = new Intent(this, ProductsListActivity.class);
         if (intent.getStringExtra("From menu") != null) {
@@ -217,7 +214,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         startActivity(inten);
     }
 
-    public void calculate(View view) {
+    public void calculate() {
         calculation();
     }
 
@@ -280,7 +277,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         return alarmNowTime.getTime().compareTo(alarmStartTime.getTime()) >= 0;
     }
 
-    public void addItem(View view) {
+    public void addItem() {
 
         if (productNameEditText.getText().toString().isEmpty()){
             Toast.makeText(this,getString(R.string.enter_a_name),Toast.LENGTH_SHORT).show();
@@ -342,7 +339,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                             complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PROTEINS), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(CARBOHYDRATES),
                             complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(FA), complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(KL),
                             String.valueOf(complicatedProductAdapter.getListGr().get(i)), "0");
-                    addComplicatedOntoHosting(this,complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListFa().get(i)),
+                    addComplicatedOntoHosting(complicatedProductAdapter.getProductMaterials().get(i).getStringExtra(PRODUCTS),String.valueOf(complicatedProductAdapter.getListFa().get(i)),
                             String.valueOf(complicatedProductAdapter.getListKl().get(i)), String.valueOf(complicatedProductAdapter.getListProteins().get(i)), String.valueOf(complicatedProductAdapter.getListCarb().get(i)), String.valueOf(complicatedProductAdapter.getListFats().get(i)),String.valueOf(complicatedProductAdapter.getListGr().get(i)));
                 }
 
@@ -362,7 +359,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                     String.valueOf(fats),String.valueOf(carb),String.valueOf(fa),String.valueOf(kl),String.valueOf(gr),"1");
 
 
-            addComplicatedProductOntoHosting(this,productName,String.valueOf(fa),
+            addComplicatedProductOntoHosting(productName,String.valueOf(fa),
                     String.valueOf(kl),String.valueOf(proteins),String.valueOf(carb),String.valueOf(fats),String.valueOf(gr));
 
 
@@ -394,9 +391,9 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
 
-    private void addComplicatedProductOntoHosting(Context context, String name, String fa, String kkal, String belok, String uglevod, String jiry,String gram){
+    private void addComplicatedProductOntoHosting(String name, String fa, String kkal, String belok, String uglevod, String jiry, String gram){
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
-                .getJSONApi()
+                .getApi(AddProductAPI.class)
                 .insertProduct(name, fa, kkal, belok, uglevod, jiry,gram, "1")
                 .enqueue(
                         new Callback<AddProductResponse>() {
@@ -410,9 +407,9 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
                         });
     }
 
-    private void addComplicatedOntoHosting(Context context, String name,String fa, String kkal, String belok, String uglevod, String jiry,String gr){
+    private void addComplicatedOntoHosting(String name, String fa, String kkal, String belok, String uglevod, String jiry, String gr){
         NetworkService.getInstance(Constants.MAIN_URL_CONST)
-                .getComplicatedApi()
+                .getApi(AddComplicatedAPI.class)
                 .insertComplicated(productName,name,jiry,belok, uglevod, fa,kkal,gr,String.valueOf(1))
                 .enqueue(
                         new Callback<AddProductResponse>() {
@@ -427,7 +424,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
     private void removeComplicatedProductFromHosting (String productName){
-        IRemoveProductAPI removeProductAPI=retrofit.create(IRemoveProductAPI.class);
+        IRemoveProductAPI removeProductAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(IRemoveProductAPI.class);
         Call<String> call=removeProductAPI.removeProduct(productName);
         call.enqueue(new Callback<String>() {
             @Override
@@ -444,7 +441,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
     private void updateGrIntoHosting(int i) {
-        UpdateGrAPI updateGrAPI=retrofit.create(UpdateGrAPI.class);
+        UpdateGrAPI updateGrAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(UpdateGrAPI.class);
         Call<String> call=updateGrAPI.updateGrApi(productName,
                 adapter.getProductMaterials().get(i).getStringExtra(PRODUCTS), String.valueOf(adapter.getListFats().get(i)),
                 String.valueOf(adapter.getListProteins().get(i)),String.valueOf(adapter.getListCarb().get(i)),String.valueOf(adapter.getListFa().get(i)),
@@ -461,7 +458,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
     private void updateProductIntoHosting(int i,ComplicatedProductAdapter complicatedProductAdapter) {
-        UpdateProductAPI updateProductAPI=retrofit.create(UpdateProductAPI.class);
+        UpdateProductAPI updateProductAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(UpdateProductAPI.class);
         Call<String> call=updateProductAPI.updateComplicated(productName, complicatedProductAdapter.getDeletedStringsList().get(i));
         call.enqueue(new Callback<String>() {
             @Override
@@ -474,9 +471,8 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
     private void removeFromHostingMenu(String date,String menu,String product) {
-
-        RemoveProductFromMenu removeProductFromMenu=retrofit.create(RemoveProductFromMenu.class);
-        Call<String> call=removeProductFromMenu.removeProductFromMenu(menu,date,product);
+        RemoveProductFromMenuAPI removeProductFromMenuAPI =NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(RemoveProductFromMenuAPI.class);
+        Call<String> call= removeProductFromMenuAPI.removeProductFromMenu(menu,date,product);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
