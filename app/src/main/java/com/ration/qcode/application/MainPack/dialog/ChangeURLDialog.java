@@ -40,7 +40,11 @@ public class ChangeURLDialog extends DialogFragment {
     }
 
     private void changeUrl(String url){
-        NetworkService.getInstance(SharedPrefManager.getManager(getContext()).getUrl()).changeRetrofitUrl(url);
-        SharedPrefManager.getManager(getContext()).setUrl(url);
+        try {
+            SharedPrefManager.getManager(getContext()).setUrl(url);
+            NetworkService.getInstance(SharedPrefManager.getManager(getContext()).getUrl()).changeRetrofitUrl(url);
+        }catch (Exception e){
+            Toast.makeText(getContext(),"Неверный формат домена!",Toast.LENGTH_SHORT).show();
+        }
     }
 }

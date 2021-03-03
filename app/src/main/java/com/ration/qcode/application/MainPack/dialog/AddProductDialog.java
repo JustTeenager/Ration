@@ -15,6 +15,7 @@ import com.ration.qcode.application.MainPack.validator.Validator;
 import com.ration.qcode.application.R;
 import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
+import com.ration.qcode.application.utils.SharedPrefManager;
 import com.ration.qcode.application.utils.internet.AddProductAPI;
 import com.ration.qcode.application.utils.internet.AddProductResponse;
 
@@ -82,7 +83,7 @@ public class AddProductDialog extends DialogFragment implements View.OnClickList
 
                                 //DataBaseHelper.getInstance(getActivity()).insertIntoProduct(name+"|",belok,jiry,uglevod,fa,kkal,"100","0");
 
-                                NetworkService.getInstance(Constants.MAIN_URL_CONST)
+                                NetworkService.getInstance(SharedPrefManager.getManager(getContext()).getUrl())
                                         .getApi(AddProductAPI.class)
                                         .insertProduct(name, fa, kkal, belok, uglevod, jiry,"100","0")
                                         .enqueue(

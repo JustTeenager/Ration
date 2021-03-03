@@ -266,7 +266,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
 
-    public void saveToDB() {
+    public void saveToDB(View v) {
         intent = getIntent();
         if (intent.getStringExtra("From menu") != null) {
             String date = intent.getStringExtra(DATE);
@@ -336,7 +336,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
 
     private void insertInHostingIntoMenu(String menu, String date, String product, String fats, String proteins, String carbohydrates,
                                          String fas, String kl, String gr,String complicated) {
-        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+        NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl())
                 .getApi(AddMenuAPI.class)
                 .insertProduct(menu,date,product,fats, proteins,carbohydrates,fas,kl,gr,complicated)
                 .enqueue(new Callback<AddProductResponse>() {
@@ -352,7 +352,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void insertInHostingIntoDate(String date){
-        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+        NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl())
                 .getApi(AddDateAPI.class)
                 .insertDate(date)
                 .enqueue(new Callback<String>() {
@@ -367,7 +367,7 @@ public class ProductInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void insertInHostingIntoDateMenu(String menu, String date){
-        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+        NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl())
                 .getApi(AddMenuDateAPI.class)
                 .insertDateMenu(menu,date)
                 .enqueue(new Callback<AddProductResponse>() {

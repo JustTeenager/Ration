@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -22,7 +23,6 @@ import android.widget.Toast;
 import com.ration.qcode.application.MainPack.adapter.ComplicatedProductAdapter;
 import com.ration.qcode.application.ProductDataBase.DataBaseHelper;
 import com.ration.qcode.application.R;
-import com.ration.qcode.application.utils.Constants;
 import com.ration.qcode.application.utils.NetworkService;
 import com.ration.qcode.application.utils.SharedPrefManager;
 import com.ration.qcode.application.utils.internet.AddComplicatedAPI;
@@ -116,7 +116,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         searchProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchProduct();
+                searchProduct(view);
             }
         });
 
@@ -196,7 +196,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         }
     }
 
-    public void searchProduct() {
+    public void searchProduct(View v) {
 
         Intent inten = new Intent(this, ProductsListActivity.class);
         if (intent.getStringExtra("From menu") != null) {
@@ -214,13 +214,14 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         startActivity(inten);
     }
 
-    public void calculate() {
+    public void calculate(View v) {
         calculation();
     }
 
     private void calculation(){
 
-        if (productRecView.getAdapter().getItemCount()>0) {
+        Log.d("tut_null", String.valueOf(productRecView.getAdapter()==null));
+        if (productRecView.getAdapter()!=null && productRecView.getAdapter().getItemCount()>0) {
             gr100=0;
             proteins100=0;
             fats100=0;
@@ -277,7 +278,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         return alarmNowTime.getTime().compareTo(alarmStartTime.getTime()) >= 0;
     }
 
-    public void addItem() {
+    public void addItem(View v) {
 
         if (productNameEditText.getText().toString().isEmpty()){
             Toast.makeText(this,getString(R.string.enter_a_name),Toast.LENGTH_SHORT).show();
@@ -285,7 +286,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
         }
 
         Intent intentProduct = new Intent(this, ProductInfoActivity.class);
-        if (productRecView.getAdapter().getItemCount()>0) {
+        if (productRecView.getAdapter()!= null && productRecView.getAdapter().getItemCount()>0) {
             if(!dateOfPay()) {
                 calculation();
             }
@@ -392,7 +393,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
 
 
     private void addComplicatedProductOntoHosting(String name, String fa, String kkal, String belok, String uglevod, String jiry, String gram){
-        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+        NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl())
                 .getApi(AddProductAPI.class)
                 .insertProduct(name, fa, kkal, belok, uglevod, jiry,gram, "1")
                 .enqueue(
@@ -408,7 +409,7 @@ public class SearchComplicatedProductActivity extends AppCompatActivity {
     }
 
     private void addComplicatedOntoHosting(String name, String fa, String kkal, String belok, String uglevod, String jiry, String gr){
-        NetworkService.getInstance(Constants.MAIN_URL_CONST)
+        NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl())
                 .getApi(AddComplicatedAPI.class)
                 .insertComplicated(productName,name,jiry,belok, uglevod, fa,kkal,gr,String.valueOf(1))
                 .enqueue(

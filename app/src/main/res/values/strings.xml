@@ -53,4 +53,5 @@
     <string name="OK">Принять</string>
     <string name="empty_url">Вы ввели пустой домен!</string>
     <string name="url_change_hint">Пишите url в подходящем формате</string>
+    <string name="permissions_needed">Для работы приложения необходимы разрешения!</string>
 </resources>

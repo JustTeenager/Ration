@@ -3,19 +3,29 @@ package com.ration.qcode.application.MainPack.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.ration.qcode.application.MainPack.dialog.AddProductDialog;
 import com.ration.qcode.application.MainPack.dialog.ChangeURLDialog;
@@ -45,6 +55,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.os.Build.VERSION.SDK_INT;
 import static com.ration.qcode.application.utils.Constants.DAY;
 import static com.ration.qcode.application.utils.Constants.HOUR;
 import static com.ration.qcode.application.utils.Constants.MINUTE;
@@ -54,6 +67,7 @@ import static com.ration.qcode.application.utils.Constants.YEAR;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int PERMISSION_REQUEST_CODE = 13;
     DataBaseHelper dataBaseHelper;
     private ProgressDialog progressDialog;
     private static final int REQUEST_CODE = 1;
@@ -68,19 +82,19 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*Gson gson = new GsonBuilder().setLenient().create();
-        retrofit = new Retrofit.Builder()
-                .baseUrl(MAIN_URL_CONST)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();*/
+
+        if (!checkPermission()) requestPermission();
+
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(getString(R.string.wait));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         dataBaseHelper = DataBaseHelper.getInstance(getApplicationContext());
 
-        preferences = getPreferences(MODE_PRIVATE);
+
         setFragment(MainListFragment.class);
+        /*preferences = getPreferences(MODE_PRIVATE);
         if(!preferences.getString("DOWNLOAD", "").equals("false")) {
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("DOWNLOAD", "false");
@@ -91,7 +105,7 @@ public class MainActivity extends AppCompatActivity
 
             new Async().execute();
             //update();
-        }
+        }*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -122,6 +136,50 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d("tut","requestPermissons");
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            Log.d("tut","вошли в нужный код");
+            if (SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    Log.d("tut","вошли");
+                    //TODO резы после гарантии
+                    downloadTheData();
+                } else {
+                    Toast.makeText(this, getString(R.string.permissions_needed), Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                if (grantResults.length > 0) {
+                    //boolean READ_EXTERNAL_STORAGE = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    //boolean WRITE_EXTERNAL_STORAGE = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    //Log.d("tut", String.valueOf(WRITE_EXTERNAL_STORAGE));
+                    //Log.d("tut", String.valueOf(READ_EXTERNAL_STORAGE));
+                    //if (READ_EXTERNAL_STORAGE && WRITE_EXTERNAL_STORAGE) {
+                        //TODO резы после гарантии
+                        downloadTheData();
+                    //} else {
+                        //Toast.makeText(this, getString(R.string.permissions_needed), Toast.LENGTH_SHORT).show();
+                   // }
+                }
+            }
+        }
+    }
+
+    private void downloadTheData() {
+        preferences = getPreferences(MODE_PRIVATE);
+        if (!preferences.getString("DOWNLOAD", "").equals("false")) {
+            Log.d("tut","шлепнули преференс");
+            SharedPreferences.Editor ed = preferences.edit();
+            ed.putString("DOWNLOAD", "false");
+            ed.commit();
+            SharedPrefManager.getManager(this).setUrl("https://sh1604917.a.had.su");
+
+
+            new Async().execute();
+        }
     }
 
     @Override
@@ -296,10 +354,39 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(Call<List<ComplicatedResponse>> call, Throwable t) {
             }
         });
-
-
-
     }
+
+    private boolean checkPermission() {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else {
+            int result = ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
+            int result1 = ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
+        }
+    }
+
+    private void requestPermission() {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.addCategory("android.intent.category.DEFAULT");
+                intent.setData(Uri.parse(String.format("package:%s", new Object[]{getApplicationContext().getPackageName()})));
+
+                startActivityForResult(intent, PERMISSION_REQUEST_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION}, PERMISSION_REQUEST_CODE);
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, PERMISSION_REQUEST_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION}, PERMISSION_REQUEST_CODE);
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
+    }
+
+
 
     private void getAllDateMenuApi() {
         IGetAllMenuDateAPI menuDateAPI=NetworkService.getInstance(SharedPrefManager.getManager(this).getUrl()).getApi(IGetAllMenuDateAPI.class);
