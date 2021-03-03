@@ -49,12 +49,14 @@ public class MainListInnerAdapter extends ArrayAdapter<String> {
         TextView textFA = (TextView) convertView.findViewById(R.id.textFA);
         TextView textBel = (TextView) convertView.findViewById(R.id.textBel);
         TextView textKl = (TextView) convertView.findViewById(R.id.textKl);
-
-        textEatingType.setText(eatingType.get(position));
-        textFA.setText(fas.get(position));
-        textBel.setText(bel.get(position));
-        textKl.setText(kl.get(position));
-
+        try {
+            textEatingType.setText(eatingType.get(position));
+            textFA.setText(fas.get(position));
+            textBel.setText(bel.get(position));
+            textKl.setText(kl.get(position));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return convertView;
     }
 }

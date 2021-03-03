@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -148,7 +149,11 @@ public class MainListAdapter extends ArrayAdapter<String> {
                             timeDate.remove(pos);
                             eatingType.remove(pos);
                             fas.remove(pos);
+                            bel.remove(pos);
+                            kl.remove(pos);
                         }
+                        Log.d("tut_list", bel.toString());
+                        Log.d("tut_list", kl.toString());
                         notifyDataSetChanged();
                     }
                 })
